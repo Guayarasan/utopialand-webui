@@ -13,11 +13,9 @@ def get_status():
 
 @app.route("/")
 def dashboard():
-    status=get_status()
-    total=None
-    if status.startswith("🟢"):
-        total=get_total_records()
-    return render_template("dashboard.html", status=status, total=total)
+    status = get_status()
+    total_logs = get_total_records() if status.startswith("🟢") else None
+    return render_template("dashboard.html", status=status, total_logs=total_logs)
 
 @app.route("/registros")
 def registros():
@@ -43,5 +41,5 @@ def estadisticas():
 def configuracion():
     return render_template("configuracion.html")
 
-if __name__=="__main__":
+if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
