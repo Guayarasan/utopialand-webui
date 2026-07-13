@@ -1,16 +1,29 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Utopialand WebUI</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Utopialand WebUI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-<div class="container">
-<h1>🌍 Utopialand WebUI</h1>
-{% block content %}{% endblock %}
+
+<div class="sidebar">
+    <h2>🌍 Utopialand</h2>
+
+    <a href="/">🏠 Dashboard</a>
+    <a href="/registros">📋 Registros</a>
+    <a href="/jugadores">👤 Jugadores</a>
+    <a href="/bloques">🧱 Bloques</a>
+    <a href="/coordenadas">📍 Coordenadas</a>
+    <a href="/estadisticas">📈 Estadísticas</a>
+    <a href="/configuracion">⚙ Configuración</a>
 </div>
-<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+<div class="content">
+{% block content %}
+{% endblock %}
+</div>
+
 </body>
 </html>
