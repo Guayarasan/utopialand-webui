@@ -1,5 +1,6 @@
 from flask import Flask, render_template
 from database import get_connection, get_total_records
+from services.records import get_latest_records
 
 app = Flask(__name__)
 
@@ -19,7 +20,8 @@ def dashboard():
 
 @app.route("/registros")
 def registros():
-    return render_template("registros.html")
+    registros = get_latest_records()
+    return render_template("registros.html", registros=registros)
 
 @app.route("/jugadores")
 def jugadores():
