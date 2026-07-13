@@ -1,0 +1,3 @@
+"""
+Consultas por coordenadas.
+"""

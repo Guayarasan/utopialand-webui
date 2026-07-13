@@ -1,0 +1,3 @@
+"""
+Consultas de estadísticas.
+"""
