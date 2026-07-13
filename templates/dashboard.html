@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<p>Servidor iniciado correctamente.</p>
+<div class="card">
+<h2>Estado</h2>
+<p>{{ status }}</p>
+<hr>
+<h3>Registros almacenados</h3>
+<p><strong>{{ "{:,}".format(total).replace(",", ".") }}</strong></p>
+</div>
+{% endblock %}
