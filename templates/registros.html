@@ -1,2 +1,70 @@
-{% extends 'base.html' %}
-{% block content %}<h2>📜 Registros</h2>{% endblock %}
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>📋 Registros</h1>
+
+<div class="card">
+
+<h3>Filtros</h3>
+
+<div style="display:grid;grid-template-columns:repeat(2,minmax(220px,1fr));gap:15px;margin-top:20px;">
+
+<div>
+<label>Jugador</label><br>
+<input type="text" placeholder="Nombre del jugador" style="width:100%;padding:10px;">
+</div>
+
+<div>
+<label>Acción</label><br>
+<select style="width:100%;padding:10px;">
+<option>Todas</option>
+<option>Break</option>
+<option>Place</option>
+<option>Container</option>
+<option>Interact</option>
+</select>
+</div>
+
+<div>
+<label>Mundo</label><br>
+<input type="text" placeholder="world">
+</div>
+
+<div>
+<label>Bloque</label><br>
+<input type="text" placeholder="stone">
+</div>
+
+</div>
+
+<button style="margin-top:20px;padding:12px 20px;">🔍 Buscar</button>
+
+</div>
+
+<div class="card">
+
+<h3>Resultados</h3>
+
+<p>Aquí aparecerán los registros de Tianyan.</p>
+
+<table style="width:100%;margin-top:20px;border-collapse:collapse;">
+<thead>
+<tr>
+<th align="left">Fecha</th>
+<th align="left">Jugador</th>
+<th align="left">Acción</th>
+<th align="left">Mundo</th>
+<th align="left">Coordenadas</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="5">Sin resultados.</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+
+{% endblock %}
