@@ -2,35 +2,54 @@
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:Arial, Helvetica, sans-serif;
+    font-family:Arial,sans-serif;
 }
 
 body{
     background:#111827;
-    color:#ffffff;
+    color:white;
 }
 
-.container{
-    width:90%;
-    max-width:1000px;
-    margin:auto;
-    padding:40px;
+.sidebar{
+    position:fixed;
+    left:0;
+    top:0;
+    width:240px;
+    height:100vh;
+    background:#1f2937;
+    padding:20px;
 }
 
-h1{
-    margin-bottom:20px;
+.sidebar h2{
+    margin-bottom:25px;
+}
+
+.sidebar a{
+    display:block;
+    color:white;
+    text-decoration:none;
+    padding:12px;
+    border-radius:8px;
+    margin-bottom:8px;
+}
+
+.sidebar a:hover{
+    background:#374151;
+}
+
+.content{
+    margin-left:260px;
+    padding:30px;
 }
 
 .card{
     background:#1f2937;
     padding:20px;
-    border-radius:12px;
+    border-radius:10px;
     margin-top:20px;
 }
 
-.online{
-    color:#4ade80;
-    font-weight:bold;
-    font-size:20px;
+hr{
+    margin:15px 0;
+    border:1px solid #374151;
 }
-
