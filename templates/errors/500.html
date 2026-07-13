@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}500 · Error interno{% endblock %}
+{% block content %}
+<div class="empty-state">
+    <div class="empty-state-icon">⚠️</div>
+    <h2>Error interno del servidor</h2>
+    <p>Ocurrió un problema procesando la solicitud. Revisa los logs del servidor.</p>
+    <a class="btn btn-primary" href="/">Volver al dashboard</a>
+</div>
+{% endblock %}

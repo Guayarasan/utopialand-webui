@@ -1,29 +1,48 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Utopialand WebUI</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Utopialand WebUI{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% block extra_head %}{% endblock %}
 </head>
 <body>
 
-<div class="sidebar">
-    <h2>🌍 Utopialand</h2>
+<button id="sidebar-toggle" class="sidebar-toggle" aria-label="Abrir menú">☰</button>
+<div id="sidebar-overlay" class="sidebar-overlay"></div>
 
-    <a href="/">🏠 Dashboard</a>
-    <a href="/registros">📋 Registros</a>
-    <a href="/jugadores">👤 Jugadores</a>
-    <a href="/bloques">🧱 Bloques</a>
-    <a href="/coordenadas">📍 Coordenadas</a>
-    <a href="/estadisticas">📈 Estadísticas</a>
-    <a href="/configuracion">⚙ Configuración</a>
-</div>
+<nav class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        <span class="sidebar-brand-icon">🌍</span>
+        <div>
+            <strong>Utopialand</strong>
+            <div class="sidebar-brand-sub">Tianyan WebUI</div>
+        </div>
+    </div>
 
-<div class="content">
-{% block content %}
-{% endblock %}
-</div>
+    <div class="sidebar-links">
+        <a href="/" class="{{ 'active' if request.path == '/' else '' }}">🏠 <span>Dashboard</span></a>
+        <a href="/registros" class="{{ 'active' if request.path == '/registros' else '' }}">📋 <span>Registros</span></a>
+        <a href="/jugadores" class="{{ 'active' if request.path == '/jugadores' else '' }}">👤 <span>Jugadores</span></a>
+        <a href="/bloques" class="{{ 'active' if request.path == '/bloques' else '' }}">🧱 <span>Bloques</span></a>
+        <a href="/coordenadas" class="{{ 'active' if request.path == '/coordenadas' else '' }}">📍 <span>Coordenadas</span></a>
+        <a href="/estadisticas" class="{{ 'active' if request.path == '/estadisticas' else '' }}">📈 <span>Estadísticas</span></a>
+        <a href="/configuracion" class="{{ 'active' if request.path == '/configuracion' else '' }}">⚙ <span>Configuración</span></a>
+    </div>
 
+    <div class="sidebar-footer">
+        <span class="badge badge-muted">v{{ config.APP_VERSION if config and config.APP_VERSION else '2.0.0' }}</span>
+    </div>
+</nav>
+
+<main class="content">
+    {% block content %}{% endblock %}
+</main>
+
+<div id="toast-container" class="toast-container"></div>
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% block extra_scripts %}{% endblock %}
 </body>
 </html>

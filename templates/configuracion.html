@@ -1,2 +1,55 @@
 {% extends 'base.html' %}
-{% block content %}<h2>⚙ Configuración</h2>{% endblock %}
+{% block title %}Configuración · Utopialand WebUI{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <div>
+        <h1>⚙ Configuración</h1>
+        <p class="page-subtitle">Estado de la conexión y datos técnicos de {{ app_name }}.</p>
+    </div>
+</header>
+
+<section class="card">
+    <div class="card-header">
+        <h3>Conexión a base de datos</h3>
+        <button id="btn-test-conn" class="btn btn-outline">🔄 Probar conexión</button>
+    </div>
+    <div id="conn-result" class="conn-result"></div>
+
+    <table class="kv-table">
+        <tr><th>Host</th><td>{{ db_info.host }}</td></tr>
+        <tr><th>Puerto</th><td>{{ db_info.port }}</td></tr>
+        <tr><th>Base de datos</th><td>{{ db_info.database }}</td></tr>
+        <tr><th>Usuario</th><td>{{ db_info.user }}</td></tr>
+        <tr><th>Tabla</th><td>{{ db_info.table }}</td></tr>
+        <tr><th>Tamaño del pool</th><td>{{ db_info.pool_size }}</td></tr>
+    </table>
+</section>
+
+<section class="card">
+    <div class="card-header">
+        <h3>Caché de agregados</h3>
+        <button id="btn-clear-cache" class="btn btn-outline">🧹 Limpiar caché</button>
+    </div>
+    <p class="muted-text">
+        Los conteos y estadísticas del dashboard se cachean brevemente en memoria para
+        no sobrecargar MySQL en tablas de millones de filas. Usa este botón si acabas
+        de insertar datos y quieres ver los cambios reflejados de inmediato.
+    </p>
+</section>
+
+<section class="card">
+    <div class="card-header"><h3>Acerca de</h3></div>
+    <table class="kv-table">
+        <tr><th>Aplicación</th><td>{{ app_name }}</td></tr>
+        <tr><th>Versión</th><td>{{ app_version }}</td></tr>
+        <tr><th>Backend</th><td>Flask + PyMySQL + DBUtils (pool de conexiones)</td></tr>
+        <tr><th>Base de datos</th><td>MySQL (Aiven)</td></tr>
+        <tr><th>Hosting</th><td>Render</td></tr>
+    </table>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/config.js') }}"></script>
+{% endblock %}

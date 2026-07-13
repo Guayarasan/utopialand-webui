@@ -1,76 +1,114 @@
 {% extends "base.html" %}
+{% block title %}Registros · Utopialand WebUI{% endblock %}
 
 {% block content %}
+<header class="page-header">
+    <div>
+        <h1>📋 Registros</h1>
+        <p class="page-subtitle">Explora, filtra y exporta todos los eventos registrados por Tianyan.</p>
+    </div>
+</header>
 
-<h1>📋 Registros</h1>
+<section class="card">
+    <form id="filters-form" class="filters-grid">
+        <div class="field">
+            <label for="f-player">Jugador</label>
+            <input id="f-player" name="player" type="text" placeholder="Nombre del jugador" autocomplete="off">
+        </div>
 
-<div class="card">
+        <div class="field">
+            <label for="f-type">Acción</label>
+            <select id="f-type" name="type" multiple size="1">
+                <option value="">Todas</option>
+                {% for t in types %}
+                <option value="{{ t }}">{{ t }}</option>
+                {% endfor %}
+            </select>
+        </div>
 
-<h3>Filtros</h3>
+        <div class="field">
+            <label for="f-world">Mundo</label>
+            <select id="f-world" name="world">
+                <option value="">Todos</option>
+                {% for w in worlds %}
+                <option value="{{ w }}">{{ w }}</option>
+                {% endfor %}
+            </select>
+        </div>
 
-<div style="display:grid;grid-template-columns:repeat(2,minmax(220px,1fr));gap:15px;margin-top:20px;">
+        <div class="field">
+            <label for="f-block">Bloque / objeto</label>
+            <input id="f-block" name="block" type="text" placeholder="stone, chest..." autocomplete="off">
+        </div>
 
-<div>
-<label>Jugador</label><br>
-<input type="text" placeholder="Nombre del jugador" style="width:100%;padding:10px;">
+        <div class="field">
+            <label for="f-date-from">Desde</label>
+            <input id="f-date-from" name="date_from_local" type="datetime-local">
+        </div>
+
+        <div class="field">
+            <label for="f-date-to">Hasta</label>
+            <input id="f-date-to" name="date_to_local" type="datetime-local">
+        </div>
+
+        <div class="field field-actions">
+            <button type="submit" class="btn btn-primary">🔍 Buscar</button>
+            <button type="button" id="btn-reset" class="btn btn-ghost">Limpiar</button>
+            <a id="btn-export" class="btn btn-outline" href="#" target="_blank" rel="noopener">⬇ Exportar CSV</a>
+        </div>
+    </form>
+</section>
+
+<section class="card">
+    <div class="card-header">
+        <h3>Resultados <span id="results-count" class="badge badge-muted"></span></h3>
+        <div class="table-controls">
+            <label class="inline-field">
+                Fecha
+                <select id="order-select">
+                    <option value="DESC">Más reciente primero</option>
+                    <option value="ASC">Más antiguo primero</option>
+                </select>
+            </label>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="data-table" id="records-table">
+            <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Jugador</th>
+                <th>Acción</th>
+                <th>Objeto</th>
+                <th>Mundo</th>
+                <th>Coordenadas</th>
+                <th>Estado</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody id="records-tbody">
+            <tr><td colspan="8" class="table-empty">Cargando registros…</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="table-footer">
+        <button id="btn-load-more" class="btn btn-outline" style="display:none;">Cargar más</button>
+    </div>
+</section>
+
+<div id="record-modal" class="modal-backdrop" hidden>
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Detalle del registro</h3>
+            <button class="modal-close" id="record-modal-close" aria-label="Cerrar">✕</button>
+        </div>
+        <div class="modal-body" id="record-modal-body"></div>
+    </div>
 </div>
+{% endblock %}
 
-<div>
-<label>Acción</label><br>
-<select style="width:100%;padding:10px;">
-<option>Todas</option>
-<option>Break</option>
-<option>Place</option>
-<option>Container</option>
-<option>Interact</option>
-</select>
-</div>
-
-<div>
-<label>Mundo</label><br>
-<input type="text" placeholder="world">
-</div>
-
-<div>
-<label>Bloque</label><br>
-<input type="text" placeholder="stone">
-</div>
-
-</div>
-
-<button style="margin-top:20px;padding:12px 20px;">🔍 Buscar</button>
-
-</div>
-
-<div class="card">
-
-<h3>Resultados</h3>
-
-<p>Aquí aparecerán los registros de Tianyan.</p>
-
-<table style="width:100%;margin-top:20px;border-collapse:collapse;">
-<thead>
-<tr>
-<th align="left">Fecha</th>
-<th align="left">Jugador</th>
-<th align="left">Acción</th>
-<th align="left">Mundo</th>
-<th align="left">Coordenadas</th>
-</tr>
-</thead>
-<tbody>
-{% for r in registros %}
-<tr>
-<td>{{ r.fecha }}</td>
-<td>{{ r.name or "-" }}</td>
-<td>{{ r.type }}</td>
-<td>{{ r.world }}</td>
-<td>{{ "%.0f"|format(r.pos_x) }} / {{ "%.0f"|format(r.pos_y) }} / {{ "%.0f"|format(r.pos_z) }}</td>
-</tr>
-{% endfor %}
-</tbody>
-</table>
-
-</div>
-
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/records.js') }}"></script>
 {% endblock %}

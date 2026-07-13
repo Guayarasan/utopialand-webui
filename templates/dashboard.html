@@ -1,20 +1,75 @@
 {% extends "base.html" %}
+{% block title %}Dashboard · Utopialand WebUI{% endblock %}
 
 {% block content %}
+<header class="page-header">
+    <div>
+        <h1>🌍 Dashboard</h1>
+        <p class="page-subtitle">Resumen general del logging de Tianyan.</p>
+    </div>
+    <span class="status-pill {{ 'status-ok' if connected else 'status-error' }}">
+        {{ status }}{% if latency_ms is not none %} · {{ latency_ms }} ms{% endif %}
+    </span>
+</header>
 
-<h1>🌍 Utopialand WebUI</h1>
+{% if overview %}
+<section class="stat-grid">
+    <div class="stat-card">
+        <span class="stat-label">Registros totales</span>
+        <span class="stat-value">{{ overview.total | miles }}</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Últimas 24 horas</span>
+        <span class="stat-value">{{ overview.today | miles }}</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Últimos 7 días</span>
+        <span class="stat-value">{{ overview.last_7_days | miles }}</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Jugadores distintos</span>
+        <span class="stat-value">{{ overview.distinct_players | miles }}</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Mundos</span>
+        <span class="stat-value">{{ overview.distinct_worlds | miles }}</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Último evento</span>
+        <span class="stat-value stat-value-sm">{{ overview.last_event_time | fecha }}</span>
+    </div>
+</section>
 
-<p>Servidor iniciado correctamente.</p>
+<section class="card">
+    <div class="card-header">
+        <h3>Distribución de eventos (top 6)</h3>
+    </div>
+    <div class="bar-list">
+        {% set max_total = type_breakdown[0].total if type_breakdown else 1 %}
+        {% for row in type_breakdown %}
+        <div class="bar-row">
+            <span class="bar-label">{{ row.type }}</span>
+            <div class="bar-track">
+                <div class="bar-fill" style="width: {{ (row.total / max_total * 100) | round(1) }}%"></div>
+            </div>
+            <span class="bar-value">{{ row.total | miles }}</span>
+        </div>
+        {% endfor %}
+    </div>
+</section>
 
-<div class="card">
-    <h2>Estado</h2>
+<section class="card quick-links">
+    <a href="/registros" class="quick-link">📋 <span>Explorar registros</span></a>
+    <a href="/jugadores" class="quick-link">👤 <span>Buscar jugadores</span></a>
+    <a href="/coordenadas" class="quick-link">📍 <span>Investigar coordenadas</span></a>
+    <a href="/estadisticas" class="quick-link">📈 <span>Ver estadísticas</span></a>
+</section>
 
-    <p>{{ status }}</p>
-
-    <hr>
-
-    <h3>Registros almacenados</h3>
-    <strong>{{ total_logs }}</strong>
+{% else %}
+<div class="empty-state">
+    <div class="empty-state-icon">🔌</div>
+    <h2>No hay conexión con la base de datos</h2>
+    <p>Verifica las variables de entorno DB_HOST, DB_NAME, DB_USER y DB_PASSWORD en <a href="/configuracion">Configuración</a>.</p>
 </div>
-
+{% endif %}
 {% endblock %}

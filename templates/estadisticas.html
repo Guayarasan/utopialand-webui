@@ -1,2 +1,48 @@
 {% extends 'base.html' %}
-{% block content %}<h2>📊 Estadísticas</h2>{% endblock %}
+{% block title %}Estadísticas · Utopialand WebUI{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <div>
+        <h1>📈 Estadísticas</h1>
+        <p class="page-subtitle">Visión general de la actividad registrada por Tianyan.</p>
+    </div>
+</header>
+
+<section class="stat-grid" id="stats-overview">
+    <div class="stat-card"><span class="stat-label">Registros totales</span><span class="stat-value" id="stat-total">…</span></div>
+    <div class="stat-card"><span class="stat-label">Últimas 24 horas</span><span class="stat-value" id="stat-today">…</span></div>
+    <div class="stat-card"><span class="stat-label">Últimos 7 días</span><span class="stat-value" id="stat-week">…</span></div>
+    <div class="stat-card"><span class="stat-label">Jugadores distintos</span><span class="stat-value" id="stat-players">…</span></div>
+</section>
+
+<section class="card">
+    <div class="card-header"><h3>Actividad diaria (últimos 30 días)</h3></div>
+    <canvas id="chart-timeseries" height="90"></canvas>
+</section>
+
+<div class="grid-2">
+    <section class="card">
+        <div class="card-header"><h3>Distribución por tipo de evento</h3></div>
+        <canvas id="chart-types" height="220"></canvas>
+    </section>
+
+    <section class="card">
+        <div class="card-header"><h3>Top jugadores</h3></div>
+        <canvas id="chart-players" height="220"></canvas>
+    </section>
+</div>
+
+<section class="card">
+    <div class="card-header"><h3>Actividad por mundo</h3></div>
+    <canvas id="chart-worlds" height="140"></canvas>
+</section>
+{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/stats.js') }}"></script>
+{% endblock %}

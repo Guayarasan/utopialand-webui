@@ -1,2 +1,71 @@
 {% extends 'base.html' %}
-{% block content %}<h2>📦 Bloques</h2>{% endblock %}
+{% block title %}Bloques · Utopialand WebUI{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <div>
+        <h1>🧱 Bloques</h1>
+        <p class="page-subtitle">Ranking de bloques más rotos, colocados o afectados por explosiones.</p>
+    </div>
+</header>
+
+<section class="card">
+    <div class="filters-grid filters-grid-compact">
+        <div class="field">
+            <label for="b-search">Bloque</label>
+            <input id="b-search" type="text" placeholder="stone, chest..." autocomplete="off">
+        </div>
+        <div class="field">
+            <label for="b-world">Mundo</label>
+            <select id="b-world">
+                <option value="">Todos</option>
+                {% for w in worlds %}
+                <option value="{{ w }}">{{ w }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="field">
+            <label for="b-sort">Ordenar por</label>
+            <select id="b-sort">
+                <option value="total">Total</option>
+                <option value="breaks">Breaks</option>
+                <option value="places">Places</option>
+                <option value="last_event">Último evento</option>
+            </select>
+        </div>
+    </div>
+</section>
+
+<section class="card">
+    <div class="card-header">
+        <h3>Bloques <span id="blocks-count" class="badge badge-muted"></span></h3>
+    </div>
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th>Bloque</th>
+                <th>Total</th>
+                <th>Breaks</th>
+                <th>Places</th>
+                <th>Explosiones</th>
+                <th>Jugadores distintos</th>
+                <th>Último evento</th>
+            </tr>
+            </thead>
+            <tbody id="blocks-tbody">
+            <tr><td colspan="7" class="table-empty">Cargando bloques…</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="table-footer">
+        <button id="bk-prev" class="btn btn-outline">← Anterior</button>
+        <span id="bk-page-label" class="badge badge-muted"></span>
+        <button id="bk-next" class="btn btn-outline">Siguiente →</button>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/blocks.js') }}"></script>
+{% endblock %}

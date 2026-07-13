@@ -1,2 +1,71 @@
 {% extends 'base.html' %}
-{% block content %}<h2>👤 Jugadores</h2>{% endblock %}
+{% block title %}Jugadores · Utopialand WebUI{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <div>
+        <h1>👤 Jugadores</h1>
+        <p class="page-subtitle">Actividad agregada por jugador: bloques rotos, colocados y más.</p>
+    </div>
+</header>
+
+<section class="card">
+    <div class="filters-grid filters-grid-compact">
+        <div class="field">
+            <label for="p-search">Buscar jugador</label>
+            <input id="p-search" type="text" placeholder="Nombre del jugador" autocomplete="off">
+        </div>
+        <div class="field">
+            <label for="p-sort">Ordenar por</label>
+            <select id="p-sort">
+                <option value="last_seen">Última actividad</option>
+                <option value="total">Total de acciones</option>
+                <option value="name">Nombre</option>
+            </select>
+        </div>
+    </div>
+</section>
+
+<section class="card">
+    <div class="card-header">
+        <h3>Jugadores <span id="players-count" class="badge badge-muted"></span></h3>
+    </div>
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th>Jugador</th>
+                <th>Total</th>
+                <th>Breaks</th>
+                <th>Places</th>
+                <th>Combate</th>
+                <th>Última actividad</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody id="players-tbody">
+            <tr><td colspan="7" class="table-empty">Cargando jugadores…</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="table-footer">
+        <button id="p-prev" class="btn btn-outline">← Anterior</button>
+        <span id="p-page-label" class="badge badge-muted"></span>
+        <button id="p-next" class="btn btn-outline">Siguiente →</button>
+    </div>
+</section>
+
+<div id="player-modal" class="modal-backdrop" hidden>
+    <div class="modal modal-lg">
+        <div class="modal-header">
+            <h3 id="player-modal-title">Jugador</h3>
+            <button class="modal-close" id="player-modal-close" aria-label="Cerrar">✕</button>
+        </div>
+        <div class="modal-body" id="player-modal-body"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/players.js') }}"></script>
+{% endblock %}
