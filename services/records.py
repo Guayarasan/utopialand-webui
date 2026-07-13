@@ -1,9 +1,8 @@
 from database import get_connection
 
-
 def get_latest_records(limit=100):
     conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor()
 
     cursor.execute("""
         SELECT
