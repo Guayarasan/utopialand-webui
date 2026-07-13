@@ -59,9 +59,15 @@
 </tr>
 </thead>
 <tbody>
+{% for r in registros %}
 <tr>
-<td colspan="5">Sin resultados.</td>
+<td>{{ r.fecha }}</td>
+<td>{{ r.name or "-" }}</td>
+<td>{{ r.type }}</td>
+<td>{{ r.world }}</td>
+<td>{{ "%.0f"|format(r.pos_x) }} / {{ "%.0f"|format(r.pos_y) }} / {{ "%.0f"|format(r.pos_z) }}</td>
 </tr>
+{% endfor %}
 </tbody>
 </table>
 
