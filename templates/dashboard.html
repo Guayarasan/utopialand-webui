@@ -1,11 +1,20 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
 {% block content %}
+
+<h1>🌍 Utopialand WebUI</h1>
+
 <p>Servidor iniciado correctamente.</p>
+
 <div class="card">
-<h2>Estado</h2>
-<p>{{ status }}</p>
-<hr>
-<h3>Registros almacenados</h3>
-<p><strong>{{ "{:,}".format(total).replace(",", ".") }}</strong></p>
+    <h2>Estado</h2>
+
+    <p>{{ status }}</p>
+
+    <hr>
+
+    <h3>Registros almacenados</h3>
+    <strong>{{ total_logs }}</strong>
 </div>
+
 {% endblock %}
