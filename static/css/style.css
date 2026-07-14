@@ -504,6 +504,9 @@ select[multiple]{ min-height: 42px; }
     font-size: 14px;
 }
 
+.row-clickable{ cursor: pointer; }
+.row-clickable:hover{ background: var(--bg-hover); }
+
 .block-identity-text{
     display: flex;
     flex-direction: column;
@@ -978,6 +981,61 @@ select[multiple]{ min-height: 42px; }
 /* ---------- Rank list (top bloques / entidades) ---------- */
 
 .rank-list{ display: flex; flex-direction: column; gap: 12px; }
+
+/* ---------- Activity feed (widgets del Dashboard) ---------- */
+
+.activity-feed{
+    max-height: 320px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.feed-item{
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 9px 4px;
+    border-bottom: 1px solid var(--border-soft);
+}
+.feed-item:last-child{ border-bottom: none; }
+
+.feed-main{
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.feed-title{
+    font-size: 13px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.feed-object{
+    color: var(--text-muted);
+    font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+    font-size: 12px;
+}
+
+.feed-meta{
+    font-size: 11.5px;
+    color: var(--text-faint);
+}
+
+.feed-time{
+    font-size: 11.5px;
+    color: var(--text-faint);
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding-top: 2px;
+}
 
 /* ---------- Filtros rápidos de fecha ---------- */
 

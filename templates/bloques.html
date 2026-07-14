@@ -71,6 +71,16 @@
         <button id="bk-next" class="btn btn-outline">Siguiente →</button>
     </div>
 </section>
+
+<div id="block-modal" class="modal-backdrop" hidden>
+    <div class="modal modal-lg">
+        <div class="modal-header">
+            <h3 id="block-modal-title">Detalle del bloque</h3>
+            <button class="modal-close" id="block-modal-close" aria-label="Cerrar">✕</button>
+        </div>
+        <div class="modal-body" id="block-modal-body"></div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_scripts %}

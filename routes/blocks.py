@@ -24,9 +24,21 @@ def api_bloques():
     return jsonify({"results": rows, "total": total})
 
 
-@bp.route("/api/bloques/<path:obj_name>/actividad")
-def api_bloque_actividad(obj_name):
-    rows = blocks_service.get_block_activity(obj_name, request.args)
+@bp.route("/api/bloques/actividad")
+def api_bloque_actividad():
+    obj_name = request.args.get("obj_name", "")
+    obj_id = request.args.get("obj_id")
+    rows = blocks_service.get_block_activity(obj_name, obj_id, request.args)
     for row in rows:
         row["fecha"] = unix_to_readable(row["time"])
     return jsonify({"results": rows})
+
+
+@bp.route("/api/bloques/resumen")
+def api_bloque_resumen():
+    obj_name = request.args.get("obj_name", "")
+    obj_id = request.args.get("obj_id")
+    summary = blocks_service.get_block_summary(obj_name, obj_id, request.args)
+    summary["totals"]["last_event_fmt"] = unix_to_readable(summary["totals"].get("last_event"))
+    summary["totals"]["first_event_fmt"] = unix_to_readable(summary["totals"].get("first_event"))
+    return jsonify(summary)

@@ -87,10 +87,10 @@ def get_top_players(limit=10):
 def get_top_blocks(limit=10):
     placeholders = ", ".join(["%s"] * len(BLOCK_TYPES))
     sql = f"""
-        SELECT obj_name, COUNT(*) AS total
+        SELECT COALESCE(NULLIF(obj_name, ''), obj_id) AS obj_name, COUNT(*) AS total
         FROM {TABLE}
-        WHERE type IN ({placeholders}) AND obj_name IS NOT NULL
-        GROUP BY obj_name
+        WHERE type IN ({placeholders}) AND COALESCE(NULLIF(obj_name, ''), obj_id) IS NOT NULL
+        GROUP BY obj_name, obj_id
         ORDER BY total DESC
         LIMIT %s
     """
@@ -101,10 +101,10 @@ def get_top_blocks(limit=10):
 def get_top_entities(limit=10):
     placeholders = ", ".join(["%s"] * len(ENTITY_TYPES))
     sql = f"""
-        SELECT obj_name, COUNT(*) AS total
+        SELECT COALESCE(NULLIF(obj_name, ''), obj_id) AS obj_name, COUNT(*) AS total
         FROM {TABLE}
-        WHERE type IN ({placeholders}) AND obj_name IS NOT NULL
-        GROUP BY obj_name
+        WHERE type IN ({placeholders}) AND COALESCE(NULLIF(obj_name, ''), obj_id) IS NOT NULL
+        GROUP BY obj_name, obj_id
         ORDER BY total DESC
         LIMIT %s
     """

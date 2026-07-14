@@ -389,7 +389,22 @@
         loadRecords();
     });
 
+    function applyFiltersFromURL() {
+        const params = new URLSearchParams(window.location.search);
+        if (!params.toString()) return;
+        const incoming = {
+            player: params.get("player") || "",
+            world: params.get("world") || "",
+            block: params.get("block") || "",
+            type: params.getAll("type"),
+        };
+        if (incoming.player || incoming.world || incoming.block || incoming.type.length) {
+            applyFilters(incoming);
+        }
+    }
+
     applyColumnVisibility();
     loadFavoriteFilters();
+    applyFiltersFromURL();
     loadRecords();
 })();

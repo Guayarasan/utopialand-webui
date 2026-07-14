@@ -13,30 +13,34 @@
 </header>
 
 {% if overview %}
-<section class="stat-grid">
+<section class="stat-grid" id="dash-overview">
     <div class="stat-card">
         <span class="stat-label">Registros totales</span>
-        <span class="stat-value">{{ overview.total | miles }}</span>
+        <span class="stat-value" id="dash-stat-total">{{ overview.total | miles }}</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Hoy</span>
+        <span class="stat-value" id="dash-stat-today-calendar">…</span>
     </div>
     <div class="stat-card">
         <span class="stat-label">Últimas 24 horas</span>
-        <span class="stat-value">{{ overview.today | miles }}</span>
+        <span class="stat-value" id="dash-stat-today">{{ overview.today | miles }}</span>
     </div>
     <div class="stat-card">
         <span class="stat-label">Últimos 7 días</span>
-        <span class="stat-value">{{ overview.last_7_days | miles }}</span>
+        <span class="stat-value" id="dash-stat-week">{{ overview.last_7_days | miles }}</span>
     </div>
     <div class="stat-card">
         <span class="stat-label">Jugadores distintos</span>
-        <span class="stat-value">{{ overview.distinct_players | miles }}</span>
+        <span class="stat-value" id="dash-stat-players">{{ overview.distinct_players | miles }}</span>
     </div>
     <div class="stat-card">
         <span class="stat-label">Mundos</span>
-        <span class="stat-value">{{ overview.distinct_worlds | miles }}</span>
+        <span class="stat-value" id="dash-stat-worlds">{{ overview.distinct_worlds | miles }}</span>
     </div>
     <div class="stat-card">
         <span class="stat-label">Último evento</span>
-        <span class="stat-value stat-value-sm">{{ overview.last_event_time | fecha }}</span>
+        <span class="stat-value stat-value-sm" id="dash-stat-last-event">{{ overview.last_event_time | fecha }}</span>
     </div>
 </section>
 
@@ -58,6 +62,48 @@
     </div>
 </section>
 
+<div class="grid-2">
+    <section class="card">
+        <div class="card-header">
+            <h3>🕓 Actividad reciente</h3>
+            <span class="badge badge-muted" id="dash-recent-badge"></span>
+        </div>
+        <div id="dash-recent-list" class="rank-list activity-feed"><p class="table-empty">Cargando…</p></div>
+    </section>
+
+    <section class="card">
+        <div class="card-header">
+            <h3>⚠️ Últimos eventos importantes</h3>
+        </div>
+        <p class="muted-text" style="margin-bottom:12px;">Explosiones, muertes y colocación de TNT/lava. Se ampliará con reglas propias en Alertas.</p>
+        <div id="dash-important-list" class="rank-list activity-feed"><p class="table-empty">Cargando…</p></div>
+    </section>
+</div>
+
+<div class="grid-2">
+    <section class="card">
+        <div class="card-header"><h3>👤 Jugadores más activos (24h)</h3></div>
+        <div id="dash-active-players" class="rank-list"><p class="table-empty">Cargando…</p></div>
+    </section>
+
+    <section class="card">
+        <div class="card-header"><h3>🧱 Bloques más modificados (24h)</h3></div>
+        <div id="dash-modified-blocks" class="rank-list"><p class="table-empty">Cargando…</p></div>
+    </section>
+</div>
+
+<div class="grid-2">
+    <section class="card">
+        <div class="card-header"><h3>💥 Últimas explosiones</h3></div>
+        <div id="dash-explosions" class="rank-list activity-feed"><p class="table-empty">Cargando…</p></div>
+    </section>
+
+    <section class="card">
+        <div class="card-header"><h3>💀 Últimas muertes</h3></div>
+        <div id="dash-deaths" class="rank-list activity-feed"><p class="table-empty">Cargando…</p></div>
+    </section>
+</div>
+
 <section class="card quick-links">
     <a href="/registros" class="quick-link">📋 <span>Explorar registros</span></a>
     <a href="/jugadores" class="quick-link">👤 <span>Buscar jugadores</span></a>
@@ -71,5 +117,11 @@
     <h2>No hay conexión con la base de datos</h2>
     <p>Verifica las variables de entorno DB_HOST, DB_NAME, DB_USER y DB_PASSWORD en <a href="/configuracion">Configuración</a>.</p>
 </div>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+{% if overview %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 {% endif %}
 {% endblock %}
