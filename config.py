@@ -43,6 +43,18 @@ class Config:
     DEBUG = _env_bool("FLASK_DEBUG", False)
     ENV = os.getenv("FLASK_ENV", "production")
 
+    # --- Autenticación ---
+    ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
+    ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")  # si no se define, se genera al azar (ver logs)
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = "Lax"
+    SESSION_COOKIE_SECURE = _env_bool("SESSION_COOKIE_SECURE", False)
+    PERMANENT_SESSION_LIFETIME = int(os.getenv("SESSION_LIFETIME_SECONDS", str(60 * 60 * 12)))
+
+    # --- Consola SQL ---
+    SQL_CONSOLE_MAX_ROWS = int(os.getenv("SQL_CONSOLE_MAX_ROWS", "1000"))
+    SQL_CONSOLE_TIMEOUT_SECONDS = int(os.getenv("SQL_CONSOLE_TIMEOUT_SECONDS", "10"))
+
     # --- App info ---
     APP_NAME = "Utopialand WebUI"
     APP_VERSION = "2.0.0"

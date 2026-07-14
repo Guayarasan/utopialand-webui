@@ -13,49 +13,55 @@ RECORD_COLUMNS = """
 """
 
 
-def get_records(args, limit=None):
+def get_records_page(args):
     """
-    Lista paginada de registros con paginación por keyset (cursor), que
-    escala bien en tablas de millones de filas a diferencia de
-    LIMIT/OFFSET (cuyo costo crece con el offset).
-
-    El cursor viaja en los parámetros `cursor_time` y `cursor_id` y
-    representa el último registro visto por el cliente. El orden es
-    siempre por `time` (más reciente primero por defecto); `order=ASC`
-    invierte la dirección tanto del ORDER BY como de la comparación del
-    cursor para mantener la paginación consistente.
+    Página de registros con paginación clásica por número de página,
+    ordenable por cualquier columna de la whitelist. Es intencionalmente
+    más simple que un cursor keyset porque el pedido explícito era poder
+    saltar a una página concreta y elegir cuántos resultados mostrar;
+    para no perder rendimiento en tablas de millones de filas, el número
+    de página está acotado (ver `MAX_JUMPABLE_PAGE` más abajo) y se anima
+    a mantener filtros que acoten bien el rango antes de paginar en
+    profundidad.
     """
     filters = Filters(args)
     clauses, params = filters.where()
-
-    ascending = str(args.get("order", "")).upper() == "ASC"
-    cmp_op = ">" if ascending else "<"
-    direction = "ASC" if ascending else "DESC"
-
-    cursor_time = args.get("cursor_time")
-    cursor_id = args.get("cursor_id")
-    if cursor_time not in (None, "") and cursor_id not in (None, ""):
-        clauses.append(f"(time {cmp_op} %s OR (time = %s AND id_pk {cmp_op} %s))")
-        params += [cursor_time, cursor_time, cursor_id]
-
     where_sql = build_where_sql(clauses)
-    limit = clamp_limit(limit or args.get("limit"))
+
+    sort_col, direction = resolve_sort(args.get("sort"), args.get("order"))
+    limit = clamp_limit(args.get("limit"))
+    page = _clamp_page(args.get("page"))
+    offset = (page - 1) * limit
 
     sql = f"""
         SELECT {RECORD_COLUMNS}
         FROM {TABLE}
         {where_sql}
-        ORDER BY time {direction}, id_pk {direction}
-        LIMIT %s
+        ORDER BY {sort_col} {direction}, id_pk {direction}
+        LIMIT %s OFFSET %s
     """
-    rows = fetch_all(sql, params + [limit])
+    rows = fetch_all(sql, params + [limit, offset])
+    total = get_records_count(args)
+    total_pages = max(1, -(-total // limit)) if total else 1
 
-    next_cursor = None
-    if len(rows) == limit:
-        last = rows[-1]
-        next_cursor = {"time": last["time"], "id_pk": last["id_pk"]}
+    return {
+        "results": rows,
+        "page": page,
+        "page_size": limit,
+        "total": total,
+        "total_pages": total_pages,
+    }
 
-    return rows, next_cursor
+
+MAX_JUMPABLE_PAGE = 20000
+
+
+def _clamp_page(raw_page):
+    try:
+        page = int(raw_page)
+    except (TypeError, ValueError):
+        return 1
+    return max(1, min(page, MAX_JUMPABLE_PAGE))
 
 
 def get_records_count(args):
@@ -63,7 +69,7 @@ def get_records_count(args):
     clauses, params = filters.where()
     where_sql = build_where_sql(clauses)
     sql = f"SELECT COUNT(*) AS total FROM {TABLE} {where_sql}"
-    return fetch_scalar(sql, params)
+    return fetch_scalar(sql, params) or 0
 
 
 def get_latest_records(limit=100):

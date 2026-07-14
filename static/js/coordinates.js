@@ -15,11 +15,17 @@
                 <td>${typeBadge(r.type)}</td>
                 <td>${escapeHTML(r.obj_name || "-")}</td>
                 <td>${fmt(r.pos_x)} / ${fmt(r.pos_y)} / ${fmt(r.pos_z)}</td>
-                <td>${r.distance} bloques</td>
+                <td><span class="badge badge-primary">${r.distance} bloques</span></td>
                 <td>${escapeHTML(r.world || "-")}</td>
             </tr>
         `;
     }
+
+    document.querySelectorAll("[data-radius]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            document.getElementById("c-radius").value = btn.dataset.radius;
+        });
+    });
 
     form.addEventListener("submit", async (e) => {
         e.preventDefault();

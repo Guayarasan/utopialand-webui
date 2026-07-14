@@ -5,7 +5,7 @@
 <header class="page-header">
     <div>
         <h1>📈 Estadísticas</h1>
-        <p class="page-subtitle">Visión general de la actividad registrada por Tianyan.</p>
+        <p class="page-subtitle">Visión general y patrones de actividad del servidor.</p>
     </div>
 </header>
 
@@ -13,6 +13,8 @@
     <div class="stat-card"><span class="stat-label">Registros totales</span><span class="stat-value" id="stat-total">…</span></div>
     <div class="stat-card"><span class="stat-label">Últimas 24 horas</span><span class="stat-value" id="stat-today">…</span></div>
     <div class="stat-card"><span class="stat-label">Últimos 7 días</span><span class="stat-value" id="stat-week">…</span></div>
+    <div class="stat-card"><span class="stat-label">Últimos 30 días</span><span class="stat-value" id="stat-month">…</span></div>
+    <div class="stat-card"><span class="stat-label">Promedio diario (30d)</span><span class="stat-value" id="stat-avg">…</span></div>
     <div class="stat-card"><span class="stat-label">Jugadores distintos</span><span class="stat-value" id="stat-players">…</span></div>
 </section>
 
@@ -23,20 +25,46 @@
 
 <div class="grid-2">
     <section class="card">
-        <div class="card-header"><h3>Distribución por tipo de evento</h3></div>
-        <canvas id="chart-types" height="220"></canvas>
+        <div class="card-header"><h3>Actividad por hora del día</h3></div>
+        <canvas id="chart-hourly" height="220"></canvas>
     </section>
 
     <section class="card">
-        <div class="card-header"><h3>Top jugadores</h3></div>
-        <canvas id="chart-players" height="220"></canvas>
+        <div class="card-header"><h3>Distribución por tipo de evento</h3></div>
+        <canvas id="chart-types" height="220"></canvas>
     </section>
 </div>
 
 <section class="card">
-    <div class="card-header"><h3>Actividad por mundo</h3></div>
-    <canvas id="chart-worlds" height="140"></canvas>
+    <div class="card-header"><h3>Mapa de calor — actividad por día y hora (últimos 30 días)</h3></div>
+    <div id="heatmap-container" class="heatmap-container">
+        <p class="table-empty">Cargando…</p>
+    </div>
 </section>
+
+<div class="grid-2">
+    <section class="card">
+        <div class="card-header"><h3>Top jugadores</h3></div>
+        <canvas id="chart-players" height="240"></canvas>
+    </section>
+
+    <section class="card">
+        <div class="card-header"><h3>Actividad por mundo</h3></div>
+        <canvas id="chart-worlds" height="240"></canvas>
+    </section>
+</div>
+
+<div class="grid-2">
+    <section class="card">
+        <div class="card-header"><h3>Top bloques (breaks + places + explosiones)</h3></div>
+        <div id="top-blocks-list" class="rank-list"><p class="table-empty">Cargando…</p></div>
+    </section>
+
+    <section class="card">
+        <div class="card-header"><h3>Top entidades</h3></div>
+        <div id="top-entities-list" class="rank-list"><p class="table-empty">Cargando…</p></div>
+    </section>
+</div>
 {% endblock %}
 
 {% block extra_head %}

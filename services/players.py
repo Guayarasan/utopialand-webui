@@ -19,9 +19,9 @@ def get_players(args):
     con conteos por tipo de acción más comunes y última actividad.
     """
     search = (args.get("search") or "").strip()
-    sort_key = args.get("sort", "last_seen")
+    sort_key = args.get("sort", "total")
     order = "ASC" if str(args.get("order", "")).upper() == "ASC" else "DESC"
-    sort_col = PLAYER_SORT_COLUMNS.get(sort_key, "last_seen")
+    sort_col = PLAYER_SORT_COLUMNS.get(sort_key, "total")
 
     limit = clamp_limit(args.get("limit"), default=50)
     offset = clamp_offset(args.get("offset"))

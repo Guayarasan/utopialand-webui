@@ -4,6 +4,7 @@
 
     const searchInput = document.getElementById("p-search");
     const sortSelect = document.getElementById("p-sort");
+    const orderSelect = document.getElementById("p-order");
     const tbody = document.getElementById("players-tbody");
     const countBadge = document.getElementById("players-count");
     const prevBtn = document.getElementById("p-prev");
@@ -39,6 +40,7 @@
         const params = {
             search: searchInput.value,
             sort: sortSelect.value,
+            order: orderSelect.value,
             limit: PAGE_SIZE,
             offset,
         };
@@ -118,6 +120,7 @@
 
     searchInput.addEventListener("input", debounce(() => loadPlayers(true), 350));
     sortSelect.addEventListener("change", () => loadPlayers(true));
+    orderSelect.addEventListener("change", () => loadPlayers(true));
     prevBtn.addEventListener("click", () => { offset = Math.max(0, offset - PAGE_SIZE); loadPlayers(false); });
     nextBtn.addEventListener("click", () => { offset += PAGE_SIZE; loadPlayers(false); });
 

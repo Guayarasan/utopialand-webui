@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}SQL · Utopialand WebUI{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <div>
+        <h1>🗄 Consola SQL</h1>
+        <p class="page-subtitle">Consultas de solo lectura (SELECT / SHOW / EXPLAIN) contra la base de datos.</p>
+    </div>
+    <span class="badge badge-warning">Solo lectura — INSERT/UPDATE/DELETE/DROP bloqueados</span>
+</header>
+
+<div class="sql-layout">
+    <section class="card sql-editor-card">
+        <div class="card-header">
+            <h3>Editor</h3>
+            <div class="table-controls">
+                <button id="btn-save-favorite" class="btn btn-outline btn-sm">⭐ Guardar</button>
+                <button id="btn-run-sql" class="btn btn-primary btn-sm">▶ Ejecutar</button>
+            </div>
+        </div>
+        <textarea id="sql-editor" class="sql-textarea" spellcheck="false" placeholder="SELECT * FROM LOGDATA ORDER BY time DESC LIMIT 100"></textarea>
+        <p class="muted-text">Atajo: Ctrl/Cmd + Enter para ejecutar.</p>
+
+        <div id="sql-result-meta" class="sql-result-meta"></div>
+        <div class="table-wrapper">
+            <table class="data-table" id="sql-result-table">
+                <thead><tr><th class="table-empty">Escribe una consulta y pulsa "Ejecutar".</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div class="table-footer" id="sql-export-actions" style="display:none;">
+            <button class="btn btn-outline btn-sm" data-export="csv">⬇ CSV</button>
+            <button class="btn btn-outline btn-sm" data-export="json">⬇ JSON</button>
+            <button class="btn btn-outline btn-sm" data-export="clipboard">📋 Copiar</button>
+        </div>
+    </section>
+
+    <aside class="sql-sidebar">
+        <section class="card">
+            <div class="card-header"><h3>⭐ Favoritas</h3></div>
+            <ul class="sql-list" id="sql-favorites-list"><li class="table-empty">Cargando…</li></ul>
+        </section>
+        <section class="card">
+            <div class="card-header"><h3>🕒 Historial</h3></div>
+            <ul class="sql-list" id="sql-history-list"><li class="table-empty">Cargando…</li></ul>
+        </section>
+    </aside>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/sql.js') }}"></script>
+{% endblock %}

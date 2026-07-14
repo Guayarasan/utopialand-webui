@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block title %}Usuarios · Utopialand WebUI{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <div>
+        <h1>🛡 Usuarios</h1>
+        <p class="page-subtitle">Gestiona quién puede acceder a la WebUI y con qué permisos.</p>
+    </div>
+    <button id="btn-new-user" class="btn btn-primary">+ Nuevo usuario</button>
+</header>
+
+<section class="card">
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th>Usuario</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th>Creado</th>
+                <th>Último acceso</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody id="users-tbody">
+            <tr><td colspan="6" class="table-empty">Cargando usuarios…</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<div id="user-modal" class="modal-backdrop" hidden>
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Nuevo usuario</h3>
+            <button class="modal-close" id="user-modal-close" aria-label="Cerrar">✕</button>
+        </div>
+        <div class="modal-body">
+            <form id="user-form" class="filters-grid" style="grid-template-columns: 1fr;">
+                <div class="field">
+                    <label for="nu-username">Usuario</label>
+                    <input id="nu-username" required minlength="3" autocomplete="off">
+                </div>
+                <div class="field">
+                    <label for="nu-password">Contraseña</label>
+                    <input id="nu-password" type="password" required minlength="8" autocomplete="new-password">
+                </div>
+                <div class="field">
+                    <label for="nu-role">Rol</label>
+                    <select id="nu-role">
+                        <option value="viewer">Solo lectura</option>
+                        <option value="moderator">Moderador</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                </div>
+                <div class="field field-actions">
+                    <button type="submit" class="btn btn-primary">Crear usuario</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="reset-modal" class="modal-backdrop" hidden>
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="reset-modal-title">Restablecer contraseña</h3>
+            <button class="modal-close" id="reset-modal-close" aria-label="Cerrar">✕</button>
+        </div>
+        <div class="modal-body">
+            <form id="reset-form" class="filters-grid" style="grid-template-columns: 1fr;">
+                <div class="field">
+                    <label for="reset-password">Nueva contraseña</label>
+                    <input id="reset-password" type="password" required minlength="8" autocomplete="new-password">
+                </div>
+                <div class="field field-actions">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/users.js') }}"></script>
+{% endblock %}

@@ -1,10 +1,12 @@
 import logging
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, redirect, request, session, url_for
 
 from config import Config
 from database import DatabaseNotConfigured, check_connection
+from services.admin_db import ensure_bootstrapped
 from utils.formatting import format_number, unix_to_readable
+from utils.security import PUBLIC_ENDPOINTS, current_user
 
 
 def create_app():
@@ -20,8 +22,26 @@ def create_app():
     app.jinja_env.filters["fecha"] = unix_to_readable
     app.jinja_env.filters["miles"] = format_number
 
+    @app.context_processor
+    def inject_current_user():
+        return {"current_user": current_user()}
+
     register_blueprints(app)
     register_error_handlers(app)
+
+    @app.before_request
+    def bootstrap_and_gate():
+        # Crea (si hace falta) las tablas propias de la WebUI y el admin inicial.
+        ensure_bootstrapped()
+
+        endpoint = request.endpoint or ""
+        if endpoint in PUBLIC_ENDPOINTS or endpoint.startswith("static"):
+            return None
+        if "user_id" in session:
+            return None
+        if request.path.startswith("/api/"):
+            return jsonify({"error": "No autenticado. Inicia sesión de nuevo."}), 401
+        return redirect(url_for("auth.login_page", next=request.path))
 
     @app.route("/api/health")
     def health():
@@ -37,6 +57,7 @@ def create_app():
 
 
 def register_blueprints(app):
+    from routes.auth import bp as auth_bp
     from routes.dashboard import bp as dashboard_bp
     from routes.records import bp as records_bp
     from routes.players import bp as players_bp
@@ -44,8 +65,14 @@ def register_blueprints(app):
     from routes.coordinates import bp as coordinates_bp
     from routes.stats import bp as stats_bp
     from routes.config import bp as config_bp
+    from routes.users import bp as users_bp
+    from routes.sql_console import bp as sql_bp
 
-    for bp in (dashboard_bp, records_bp, players_bp, blocks_bp, coordinates_bp, stats_bp, config_bp):
+    blueprints = (
+        auth_bp, dashboard_bp, records_bp, players_bp, blocks_bp,
+        coordinates_bp, stats_bp, config_bp, users_bp, sql_bp,
+    )
+    for bp in blueprints:
         app.register_blueprint(bp)
 
 

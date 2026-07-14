@@ -54,20 +54,48 @@
         <div class="field field-actions">
             <button type="submit" class="btn btn-primary">🔍 Buscar</button>
             <button type="button" id="btn-reset" class="btn btn-ghost">Limpiar</button>
-            <a id="btn-export" class="btn btn-outline" href="#" target="_blank" rel="noopener">⬇ Exportar CSV</a>
         </div>
     </form>
+
+    <div class="quick-dates">
+        <button type="button" class="btn btn-sm btn-outline" data-range="1">Última hora</button>
+        <button type="button" class="btn btn-sm btn-outline" data-range="24">Últimas 24h</button>
+        <button type="button" class="btn btn-sm btn-outline" data-range="168">Últimos 7 días</button>
+        <button type="button" class="btn btn-sm btn-outline" data-range="720">Últimos 30 días</button>
+    </div>
 </section>
 
 <section class="card">
     <div class="card-header">
         <h3>Resultados <span id="results-count" class="badge badge-muted"></span></h3>
         <div class="table-controls">
+            <div class="export-dropdown">
+                <button type="button" id="btn-export-toggle" class="btn btn-outline btn-sm">⬇ Exportar</button>
+                <div class="export-menu" id="export-menu" hidden>
+                    <button data-export="csv">CSV</button>
+                    <button data-export="xlsx">Excel (.xlsx)</button>
+                    <button data-export="json">JSON</button>
+                    <button data-export="clipboard">📋 Copiar página actual</button>
+                </div>
+            </div>
+
+            <div class="export-dropdown" id="favorites-dropdown">
+                <button type="button" id="btn-favorites-toggle" class="btn btn-outline btn-sm">⭐ Filtros guardados</button>
+                <div class="export-menu" id="favorites-menu" hidden></div>
+            </div>
+            <button type="button" id="btn-save-filter" class="btn btn-outline btn-sm">💾 Guardar filtro</button>
+
+            <div class="column-toggle">
+                <button type="button" id="btn-columns-toggle" class="btn btn-outline btn-sm">☰ Columnas</button>
+                <div class="column-toggle-menu" id="columns-menu" hidden></div>
+            </div>
+
             <label class="inline-field">
-                Fecha
-                <select id="order-select">
-                    <option value="DESC">Más reciente primero</option>
-                    <option value="ASC">Más antiguo primero</option>
+                <select id="page-size-select">
+                    <option value="25">25 / página</option>
+                    <option value="50" selected>50 / página</option>
+                    <option value="100">100 / página</option>
+                    <option value="200">200 / página</option>
                 </select>
             </label>
         </div>
@@ -77,14 +105,14 @@
         <table class="data-table" id="records-table">
             <thead>
             <tr>
-                <th>Fecha</th>
-                <th>Jugador</th>
-                <th>Acción</th>
-                <th>Objeto</th>
-                <th>Mundo</th>
-                <th>Coordenadas</th>
-                <th>Estado</th>
-                <th></th>
+                <th data-col="fecha" data-sort="time">Fecha <span class="sort-arrow"></span></th>
+                <th data-col="name" data-sort="name">Jugador <span class="sort-arrow"></span></th>
+                <th data-col="type" data-sort="type">Acción <span class="sort-arrow"></span></th>
+                <th data-col="obj_name" data-sort="obj_name">Objeto <span class="sort-arrow"></span></th>
+                <th data-col="world" data-sort="world">Mundo <span class="sort-arrow"></span></th>
+                <th data-col="coords">Coordenadas</th>
+                <th data-col="status" data-sort="status">Estado <span class="sort-arrow"></span></th>
+                <th data-col="actions"></th>
             </tr>
             </thead>
             <tbody id="records-tbody">
@@ -94,7 +122,7 @@
     </div>
 
     <div class="table-footer">
-        <button id="btn-load-more" class="btn btn-outline" style="display:none;">Cargar más</button>
+        <div class="pagination" id="pagination"></div>
     </div>
 </section>
 

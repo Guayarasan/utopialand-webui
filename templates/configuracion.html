@@ -10,6 +10,28 @@
 </header>
 
 <section class="card">
+    <div class="card-header"><h3>Mi cuenta</h3></div>
+    <table class="kv-table">
+        <tr><th>Usuario</th><td>{{ current_user.username if current_user else '-' }}</td></tr>
+        <tr><th>Rol</th><td>{{ {'admin': 'Administrador', 'moderator': 'Moderador', 'viewer': 'Solo lectura'}.get(current_user.role, current_user.role) if current_user else '-' }}</td></tr>
+    </table>
+
+    <form id="change-password-form" class="filters-grid filters-grid-compact" style="margin-top:16px;">
+        <div class="field">
+            <label for="cp-current">Contraseña actual</label>
+            <input id="cp-current" type="password" autocomplete="current-password" required>
+        </div>
+        <div class="field">
+            <label for="cp-new">Nueva contraseña</label>
+            <input id="cp-new" type="password" autocomplete="new-password" minlength="8" required>
+        </div>
+        <div class="field field-actions">
+            <button type="submit" class="btn btn-primary">Cambiar contraseña</button>
+        </div>
+    </form>
+</section>
+
+<section class="card">
     <div class="card-header">
         <h3>Conexión a base de datos</h3>
         <button id="btn-test-conn" class="btn btn-outline">🔄 Probar conexión</button>

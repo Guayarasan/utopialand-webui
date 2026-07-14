@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}403 · Sin permisos{% endblock %}
+{% block content %}
+<div class="empty-state">
+    <div class="empty-state-icon">🔒</div>
+    <h2>No tienes permisos suficientes</h2>
+    <p>Esta sección requiere un rol superior al que tiene tu cuenta.</p>
+    <a class="btn btn-primary" href="/">Volver al dashboard</a>
+</div>
+{% endblock %}

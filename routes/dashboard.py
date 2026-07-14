@@ -2,11 +2,13 @@ from flask import Blueprint, render_template
 
 from database import DatabaseNotConfigured, check_connection
 from services import stats
+from utils.security import login_required
 
 bp = Blueprint("dashboard", __name__)
 
 
 @bp.route("/")
+@login_required
 def dashboard():
     ok, message, latency_ms = check_connection()
     status_label = f"🟢 {message}" if ok else f"🔴 {message}"

@@ -5,6 +5,7 @@
     const testBtn = document.getElementById("btn-test-conn");
     const resultBox = document.getElementById("conn-result");
     const clearCacheBtn = document.getElementById("btn-clear-cache");
+    const changePasswordForm = document.getElementById("change-password-form");
 
     testBtn.addEventListener("click", async () => {
         testBtn.disabled = true;
@@ -33,4 +34,24 @@
             toast(err.message, "error");
         }
     });
+
+    if (changePasswordForm) {
+        changePasswordForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            try {
+                await fetchJSON("/api/auth/cambiar-password", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        current_password: document.getElementById("cp-current").value,
+                        new_password: document.getElementById("cp-new").value,
+                    }),
+                });
+                toast("Contraseña actualizada correctamente", "success");
+                changePasswordForm.reset();
+            } catch (err) {
+                toast(err.message, "error");
+            }
+        });
+    }
 })();
