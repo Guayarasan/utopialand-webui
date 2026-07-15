@@ -2,9 +2,10 @@
     "use strict";
     const { toast, fetchJSON, escapeHTML, formatNumber } = window.Utopialand;
 
-    const editor = document.getElementById("sql-editor");
+    const textarea = document.getElementById("sql-editor");
     const runBtn = document.getElementById("btn-run-sql");
     const saveFavBtn = document.getElementById("btn-save-favorite");
+    const copySqlBtn = document.getElementById("btn-copy-sql");
     const resultMeta = document.getElementById("sql-result-meta");
     const resultTable = document.getElementById("sql-result-table");
     const exportActions = document.getElementById("sql-export-actions");
@@ -13,8 +14,52 @@
 
     let lastResult = null;
 
+    // -------- Editor con resaltado de sintaxis + autocompletado --------
+    // Columnas reales de LOGDATA, documentadas en services/query_builder.py
+    // -- no inventar otras.
+    const LOGDATA_COLUMNS = [
+        "id_pk", "uuid", "id", "name", "pos_x", "pos_y", "pos_z", "world",
+        "obj_id", "obj_name", "time", "type", "data", "status",
+    ];
+
+    let cm = null;
+    if (window.CodeMirror) {
+        cm = CodeMirror.fromTextArea(textarea, {
+            mode: "text/x-mysql",
+            theme: "dracula",
+            lineNumbers: true,
+            matchBrackets: true,
+            autoCloseBrackets: true,
+            indentWithTabs: true,
+            hintOptions: {
+                tables: { LOGDATA: LOGDATA_COLUMNS },
+            },
+            extraKeys: {
+                "Ctrl-Enter": () => runQuery(),
+                "Cmd-Enter": () => runQuery(),
+                "Ctrl-Space": "autocomplete",
+                "Cmd-Space": "autocomplete",
+            },
+        });
+        cm.setSize("100%", "260px");
+        cm.on("inputRead", (instance, change) => {
+            if (change.text[0] && /[a-zA-Z_.]/.test(change.text[0])) {
+                instance.showHint({ completeSingle: false });
+            }
+        });
+    }
+
+    function getSQL() {
+        return (cm ? cm.getValue() : textarea.value).trim();
+    }
+
+    function setSQL(value) {
+        if (cm) cm.setValue(value || "");
+        else textarea.value = value || "";
+    }
+
     async function runQuery() {
-        const sql = editor.value.trim();
+        const sql = getSQL();
         if (!sql) {
             toast("Escribe una consulta antes de ejecutar.", "error");
             return;
@@ -112,15 +157,46 @@
         }
     });
 
+    copySqlBtn.addEventListener("click", async () => {
+        const sql = getSQL();
+        if (!sql) {
+            toast("No hay consulta que copiar.", "error");
+            return;
+        }
+        try {
+            await navigator.clipboard.writeText(sql);
+            toast("Consulta copiada al portapapeles", "success");
+        } catch (err) {
+            toast("No se pudo copiar", "error");
+        }
+    });
+
+    // -------- Favoritas (agrupadas por categoría) --------
+
     async function loadFavorites() {
         try {
             const data = await fetchJSON("/api/sql/favoritas");
             favoritesList.innerHTML = data.results.length
-                ? data.results.map(favoriteItemHTML).join("")
+                ? groupedFavoritesHTML(data.results)
                 : `<li class="table-empty">Sin consultas guardadas.</li>`;
         } catch (err) {
             favoritesList.innerHTML = `<li class="table-empty">Error al cargar.</li>`;
         }
+    }
+
+    function groupedFavoritesHTML(rows) {
+        const groups = new Map();
+        rows.forEach((f) => {
+            const key = f.category || (f.is_example ? "Ejemplos" : "Sin categoría");
+            if (!groups.has(key)) groups.set(key, []);
+            groups.get(key).push(f);
+        });
+        let html = "";
+        groups.forEach((items, category) => {
+            html += `<li class="sql-list-category">${escapeHTML(category)}</li>`;
+            html += items.map(favoriteItemHTML).join("");
+        });
+        return html;
     }
 
     function favoriteItemHTML(fav) {
@@ -128,7 +204,10 @@
             <li class="sql-list-item" data-sql="${escapeHTML(fav.sql_text)}">
                 <div class="sql-list-item-title">
                     <span>${fav.is_example ? "📌 " : ""}${escapeHTML(fav.name)}</span>
-                    ${fav.is_example ? "" : `<button class="sql-list-item-delete" data-delete-fav="${fav.id}" title="Eliminar">✕</button>`}
+                    <span class="sql-list-item-actions">
+                        <button class="sql-list-item-copy" data-copy-sql="${escapeHTML(fav.sql_text)}" title="Copiar consulta">📋</button>
+                        ${fav.is_example ? "" : `<button class="sql-list-item-delete" data-delete-fav="${fav.id}" title="Eliminar">✕</button>`}
+                    </span>
                 </div>
                 <div class="sql-list-item-sql">${escapeHTML(fav.sql_text.replace(/\s+/g, " "))}</div>
             </li>
@@ -136,6 +215,17 @@
     }
 
     favoritesList.addEventListener("click", async (e) => {
+        const copyBtn = e.target.closest("[data-copy-sql]");
+        if (copyBtn) {
+            e.stopPropagation();
+            try {
+                await navigator.clipboard.writeText(copyBtn.dataset.copySql);
+                toast("Consulta copiada", "success");
+            } catch (err) {
+                toast("No se pudo copiar", "error");
+            }
+            return;
+        }
         const delBtn = e.target.closest("[data-delete-fav]");
         if (delBtn) {
             e.stopPropagation();
@@ -148,7 +238,7 @@
             return;
         }
         const item = e.target.closest(".sql-list-item");
-        if (item) editor.value = item.dataset.sql;
+        if (item) setSQL(item.dataset.sql);
     });
 
     async function loadHistory() {
@@ -168,30 +258,45 @@
             <li class="sql-list-item" data-sql="${escapeHTML(h.sql_text)}">
                 <div class="sql-list-item-title">
                     <span>${icon} ${escapeHTML(h.executed_at_fmt)}</span>
+                    <span class="sql-list-item-actions">
+                        <button class="sql-list-item-copy" data-copy-sql="${escapeHTML(h.sql_text)}" title="Copiar consulta">📋</button>
+                    </span>
                 </div>
                 <div class="sql-list-item-sql">${escapeHTML(h.sql_text.replace(/\s+/g, " "))}</div>
             </li>
         `;
     }
 
-    historyList.addEventListener("click", (e) => {
+    historyList.addEventListener("click", async (e) => {
+        const copyBtn = e.target.closest("[data-copy-sql]");
+        if (copyBtn) {
+            e.stopPropagation();
+            try {
+                await navigator.clipboard.writeText(copyBtn.dataset.copySql);
+                toast("Consulta copiada", "success");
+            } catch (err) {
+                toast("No se pudo copiar", "error");
+            }
+            return;
+        }
         const item = e.target.closest(".sql-list-item");
-        if (item) editor.value = item.dataset.sql;
+        if (item) setSQL(item.dataset.sql);
     });
 
     saveFavBtn.addEventListener("click", async () => {
-        const sql = editor.value.trim();
+        const sql = getSQL();
         if (!sql) {
             toast("Escribe una consulta primero.", "error");
             return;
         }
         const name = prompt("Nombre para esta consulta guardada:");
         if (!name) return;
+        const category = prompt("Categoría (opcional, ej. Investigación, Rankings):", "") || "";
         try {
             await fetchJSON("/api/sql/favoritas", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name, sql }),
+                body: JSON.stringify({ name, sql, category }),
             });
             toast("Consulta guardada", "success");
             loadFavorites();
@@ -201,7 +306,7 @@
     });
 
     runBtn.addEventListener("click", runQuery);
-    editor.addEventListener("keydown", (e) => {
+    textarea.addEventListener("keydown", (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
             e.preventDefault();
             runQuery();

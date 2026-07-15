@@ -67,10 +67,11 @@ def register_blueprints(app):
     from routes.config import bp as config_bp
     from routes.users import bp as users_bp
     from routes.sql_console import bp as sql_bp
+    from routes.alerts import bp as alerts_bp
 
     blueprints = (
         auth_bp, dashboard_bp, records_bp, players_bp, blocks_bp,
-        coordinates_bp, stats_bp, config_bp, users_bp, sql_bp,
+        coordinates_bp, stats_bp, config_bp, users_bp, sql_bp, alerts_bp,
     )
     for bp in blueprints:
         app.register_blueprint(bp)

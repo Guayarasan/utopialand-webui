@@ -2,8 +2,9 @@
 
 import math
 
-from database import fetch_all
+from database import fetch_all, get_connection
 from services.query_builder import TABLE, Filters, build_where_sql, clamp_limit
+from utils.formatting import now_unix
 
 
 def search_near(args):
@@ -51,3 +52,47 @@ def search_near(args):
 
     results.sort(key=lambda r: r["distance"])
     return results[:limit], {"scanned": len(rows), "matched": len(results)}
+
+
+# ---------- Ubicaciones favoritas (Spawn, Base, Tienda, Granja, Cofres...) ----------
+
+def list_favorite_locations(user_id):
+    return fetch_all(
+        "SELECT id, name, world, pos_x, pos_y, pos_z, icon, created_at "
+        "FROM webui_favorite_locations WHERE user_id = %s ORDER BY created_at DESC",
+        [user_id],
+    )
+
+
+def save_favorite_location(user_id, name, world, x, y, z, icon=None):
+    name = (name or "").strip()
+    if not name:
+        raise ValueError("El nombre del lugar no puede estar vacío.")
+    if x is None or y is None or z is None:
+        raise ValueError("Faltan coordenadas X/Y/Z.")
+
+    conn = get_connection()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                "INSERT INTO webui_favorite_locations "
+                "(user_id, name, world, pos_x, pos_y, pos_z, icon, created_at) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                (user_id, name, world or None, x, y, z, icon or "📍", now_unix()),
+            )
+            return cur.lastrowid
+    finally:
+        conn.close()
+
+
+def delete_favorite_location(location_id, user_id):
+    conn = get_connection()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                "DELETE FROM webui_favorite_locations WHERE id = %s AND user_id = %s",
+                (location_id, user_id),
+            )
+            return cur.rowcount > 0
+    finally:
+        conn.close()

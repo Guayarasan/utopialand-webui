@@ -133,26 +133,27 @@ def get_history(user_id, limit=30):
 def get_favorites(user_id):
     """Ejemplos predefinidos (user_id NULL) + favoritas propias del usuario."""
     return fetch_all(
-        "SELECT id, user_id, name, sql_text, is_example, created_at "
+        "SELECT id, user_id, name, category, sql_text, is_example, created_at "
         "FROM webui_saved_queries WHERE user_id IS NULL OR user_id = %s "
-        "ORDER BY is_example DESC, created_at DESC",
+        "ORDER BY is_example DESC, category IS NULL, category, created_at DESC",
         [user_id],
     )
 
 
-def save_favorite(user_id, name, sql_text):
+def save_favorite(user_id, name, sql_text, category=None):
     name = (name or "").strip()
     if not name:
         raise SQLConsoleError("El nombre de la consulta guardada no puede estar vacío.")
     validate_readonly(sql_text)
+    category = (category or "").strip() or None
 
     conn = get_connection()
     try:
         with conn.cursor() as cur:
             cur.execute(
-                "INSERT INTO webui_saved_queries (user_id, name, sql_text, is_example, created_at) "
-                "VALUES (%s, %s, %s, 0, %s)",
-                (user_id, name, sql_text.strip(), now_unix()),
+                "INSERT INTO webui_saved_queries (user_id, name, category, sql_text, is_example, created_at) "
+                "VALUES (%s, %s, %s, %s, 0, %s)",
+                (user_id, name, category, sql_text.strip(), now_unix()),
             )
             return cur.lastrowid
     finally:

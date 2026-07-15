@@ -46,7 +46,9 @@ def api_favoritas():
 def api_guardar_favorita():
     data = request.get_json(silent=True) or {}
     try:
-        fav_id = sql_service.save_favorite(current_user()["id"], data.get("name"), data.get("sql", ""))
+        fav_id = sql_service.save_favorite(
+            current_user()["id"], data.get("name"), data.get("sql", ""), data.get("category")
+        )
     except SQLConsoleError as exc:
         return jsonify({"error": str(exc)}), 400
     return jsonify({"ok": True, "id": fav_id})

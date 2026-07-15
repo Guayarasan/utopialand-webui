@@ -1,6 +1,6 @@
 (function () {
     "use strict";
-    const { toast, fetchJSON, formatNumber, escapeHTML, typeBadge, buildQueryString, setupModal } = window.Utopialand;
+    const { toast, fetchJSON, formatNumber, escapeHTML, typeBadge, buildQueryString, setupModal, debounce } = window.Utopialand;
 
     const form = document.getElementById("filters-form");
     const tbody = document.getElementById("records-tbody");
@@ -84,14 +84,105 @@
             document.getElementById("f-date-to").value = "";
             state.page = 1;
             loadRecords();
+            pushRecentFilter(currentFilters());
         });
     });
+
+    // Búsqueda instantánea: jugador/bloque filtran solos mientras se escribe,
+    // sin necesitar pulsar "Buscar". El resto de filtros ya disparan al cambiar.
+    const instantInputs = [document.getElementById("f-player"), document.getElementById("f-block")];
+    instantInputs.forEach((input) => {
+        if (!input) return;
+        input.addEventListener("input", debounce(() => {
+            state.page = 1;
+            loadRecords();
+        }, 400));
+    });
+    ["f-world", "f-type"].forEach((id) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener("change", () => {
+            state.page = 1;
+            loadRecords();
+            pushRecentFilter(currentFilters());
+        });
+    });
+
+    const RECENT_STORAGE_KEY = "utopialand_records_recent";
+    const RECENT_MAX = 6;
+
+    function filterLabel(filters) {
+        const bits = [];
+        if (filters.player) bits.push(`Jugador: ${filters.player}`);
+        if (filters.block) bits.push(`Bloque: ${filters.block}`);
+        if (filters.world) bits.push(`Mundo: ${filters.world}`);
+        if (filters.type && filters.type.length) bits.push(`Acción: ${filters.type.join(", ")}`);
+        if (filters.date_from) bits.push("con rango de fecha");
+        return bits.length ? bits.join(" · ") : null;
+    }
+
+    function getRecentFilters() {
+        try {
+            return JSON.parse(localStorage.getItem(RECENT_STORAGE_KEY)) || [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function pushRecentFilter(filters) {
+        const label = filterLabel(filters);
+        if (!label) return; // no vale la pena recordar "sin filtros"
+        const key = JSON.stringify(filters);
+        let recent = getRecentFilters().filter((r) => JSON.stringify(r.filters) !== key);
+        recent.unshift({ filters, label });
+        recent = recent.slice(0, RECENT_MAX);
+        localStorage.setItem(RECENT_STORAGE_KEY, JSON.stringify(recent));
+        renderRecentMenu();
+    }
+
+    function renderRecentMenu() {
+        const menu = document.getElementById("recent-menu");
+        if (!menu) return;
+        const recent = getRecentFilters();
+        menu.innerHTML = recent.length
+            ? recent.map((r, i) => `<button data-apply-recent="${i}">${escapeHTML(r.label)}</button>`).join("")
+            : `<button disabled>Sin búsquedas recientes</button>`;
+    }
+
+    const recentMenuEl = document.getElementById("recent-menu");
+    if (recentMenuEl) {
+        recentMenuEl.addEventListener("click", (e) => {
+            const btn = e.target.closest("[data-apply-recent]");
+            if (!btn) return;
+            const recent = getRecentFilters();
+            const entry = recent[Number(btn.dataset.applyRecent)];
+            if (entry) {
+                applyFilters(entry.filters);
+                state.page = 1;
+                loadRecords();
+            }
+        });
+        setupDropdown("btn-recent-toggle", "recent-menu");
+    }
 
     // ---------------- Carga y render ----------------
 
     function fmtCoords(r) {
         const fmt = (v) => (v === null || v === undefined ? "?" : Math.round(v));
         return `${fmt(r.pos_x)} / ${fmt(r.pos_y)} / ${fmt(r.pos_z)}`;
+    }
+
+    function coordsCellHTML(r) {
+        if (r.pos_x === null || r.pos_x === undefined) return "?";
+        const coordsText = `${Math.round(r.pos_x)}, ${Math.round(r.pos_y)}, ${Math.round(r.pos_z)}`;
+        const radiusLink = `/coordenadas?${buildQueryString({ x: Math.round(r.pos_x), y: Math.round(r.pos_y), z: Math.round(r.pos_z), radius: 50, world: r.world || "" })}`;
+        return `
+            <span class="coords-cell">
+                ${escapeHTML(fmtCoords(r))}
+                <button type="button" class="coord-mini-btn coord-copy" data-coords="${escapeHTML(coordsText)}" title="Copiar coordenadas">📋</button>
+                <a class="coord-mini-btn" href="${radiusLink}" target="_blank" rel="noopener" title="Buscar por radio desde aquí">🎯</a>
+            </span>
+        `;
     }
 
     function rowHTML(r) {
@@ -102,7 +193,7 @@
                 <td data-col="type">${typeBadge(r.type)}</td>
                 <td data-col="obj_name">${escapeHTML(r.obj_name || "-")}</td>
                 <td data-col="world">${escapeHTML(r.world || "-")}</td>
-                <td data-col="coords">${fmtCoords(r)}</td>
+                <td data-col="coords">${coordsCellHTML(r)}</td>
                 <td data-col="status">${escapeHTML(r.status ?? "-")}</td>
                 <td data-col="actions"><button class="row-link" data-id="${r.id_pk}">Ver</button></td>
             </tr>
@@ -343,6 +434,8 @@
         modalBody.innerHTML = "<p>Cargando…</p>";
         try {
             const r = await fetchJSON(`/api/registros/${id}`);
+            const coordsText = (r.pos_x !== null && r.pos_x !== undefined) ? `${Math.round(r.pos_x)}, ${Math.round(r.pos_y)}, ${Math.round(r.pos_z)}` : null;
+            const radiusLink = coordsText ? `/coordenadas?${buildQueryString({ x: Math.round(r.pos_x), y: Math.round(r.pos_y), z: Math.round(r.pos_z), radius: 50, world: r.world || "" })}` : null;
             modalBody.innerHTML = `
                 <dl class="detail-grid">
                     <dt>Fecha</dt><dd>${escapeHTML(r.fecha)}</dd>
@@ -351,7 +444,12 @@
                     <dt>Acción</dt><dd>${typeBadge(r.type)}</dd>
                     <dt>Objeto</dt><dd>${escapeHTML(r.obj_name || "-")} ${r.obj_id !== null ? "(id " + escapeHTML(r.obj_id) + ")" : ""}</dd>
                     <dt>Mundo</dt><dd>${escapeHTML(r.world || "-")}</dd>
-                    <dt>Coordenadas</dt><dd>${fmtCoords(r)}</dd>
+                    <dt>Coordenadas</dt>
+                    <dd>
+                        ${fmtCoords(r)}
+                        ${coordsText ? `<button type="button" class="coord-mini-btn coord-copy" data-coords="${escapeHTML(coordsText)}" title="Copiar">📋</button>` : ""}
+                        ${radiusLink ? `<a class="coord-mini-btn" href="${radiusLink}" target="_blank" rel="noopener" title="Buscar por radio desde aquí">🎯</a>` : ""}
+                    </dd>
                     <dt>Estado</dt><dd>${escapeHTML(r.status ?? "-")}</dd>
                     <dt>ID interno</dt><dd>${escapeHTML(r.id ?? "-")} (pk ${escapeHTML(r.id_pk)})</dd>
                 </dl>
@@ -365,9 +463,30 @@
         }
     }
 
-    tbody.addEventListener("click", (e) => {
+    tbody.addEventListener("click", async (e) => {
+        const copyBtn = e.target.closest(".coord-copy");
+        if (copyBtn) {
+            try {
+                await navigator.clipboard.writeText(copyBtn.dataset.coords);
+                toast("Coordenadas copiadas", "success");
+            } catch (err) {
+                toast("No se pudo copiar", "error");
+            }
+            return;
+        }
         const btn = e.target.closest(".row-link");
         if (btn) openDetail(btn.dataset.id);
+    });
+
+    modalBody.addEventListener("click", async (e) => {
+        const copyBtn = e.target.closest(".coord-copy");
+        if (!copyBtn) return;
+        try {
+            await navigator.clipboard.writeText(copyBtn.dataset.coords);
+            toast("Coordenadas copiadas", "success");
+        } catch (err) {
+            toast("No se pudo copiar", "error");
+        }
     });
 
     // ---------------- Eventos generales ----------------
@@ -376,6 +495,7 @@
         e.preventDefault();
         state.page = 1;
         loadRecords();
+        pushRecentFilter(currentFilters());
     });
 
     resetBtn.addEventListener("click", () => {
@@ -405,6 +525,7 @@
 
     applyColumnVisibility();
     loadFavoriteFilters();
+    renderRecentMenu();
     applyFiltersFromURL();
     loadRecords();
 })();

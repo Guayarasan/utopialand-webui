@@ -507,6 +507,58 @@ select[multiple]{ min-height: 42px; }
 .row-clickable{ cursor: pointer; }
 .row-clickable:hover{ background: var(--bg-hover); }
 
+/* ---------- Chips (lugares favoritos, etc.) ---------- */
+
+.chip-list{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.chip{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border-soft);
+    background: var(--bg-elevated);
+    color: var(--text);
+    font-size: 12.5px;
+    cursor: pointer;
+    transition: border-color .15s ease, transform .1s ease;
+}
+.chip:hover{ border-color: var(--primary); transform: translateY(-1px); }
+
+.chip-remove{
+    opacity: .5;
+    font-size: 11px;
+    padding: 0 2px;
+    border-radius: 50%;
+}
+.chip-remove:hover{ opacity: 1; color: var(--danger); }
+
+/* ---------- Acciones rápidas de coordenadas (Registros / Coordenadas) ---------- */
+
+.coords-cell{ display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+
+.coord-mini-btn{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+    text-decoration: none;
+}
+.coord-mini-btn:hover{ background: var(--bg-hover); border-color: var(--border-soft); color: var(--text); }
+
 .block-identity-text{
     display: flex;
     flex-direction: column;
@@ -802,6 +854,17 @@ select[multiple]{ min-height: 42px; }
 }
 .sql-textarea:focus{ border-color: var(--primary); }
 
+/* CodeMirror sustituye al textarea; heredamos su misma "caja". */
+.sql-editor-card .CodeMirror{
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+    font-size: 13.5px;
+    line-height: 1.6;
+    height: 260px;
+}
+.sql-editor-card .CodeMirror-focused{ border-color: var(--primary); }
+
 .sql-result-meta{
     font-size: 12.5px;
     color: var(--text-muted);
@@ -813,6 +876,16 @@ select[multiple]{ min-height: 42px; }
 .sql-sidebar .card{ margin-bottom: 0; }
 
 .sql-list{ list-style: none; display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow-y: auto; }
+
+.sql-list-category{
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--text-faint);
+    padding: 8px 2px 0;
+    font-weight: 700;
+}
+.sql-list-category:first-child{ padding-top: 0; }
 
 .sql-list-item{
     background: var(--bg-elevated);
@@ -843,6 +916,9 @@ select[multiple]{ min-height: 42px; }
     text-overflow: ellipsis;
 }
 
+.sql-list-item-actions{ display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+
+.sql-list-item-copy,
 .sql-list-item-delete{
     background: none;
     border: none;
@@ -851,7 +927,43 @@ select[multiple]{ min-height: 42px; }
     font-size: 12px;
     flex-shrink: 0;
 }
+.sql-list-item-copy:hover{ color: var(--primary); }
 .sql-list-item-delete:hover{ color: var(--danger); }
+
+/* ---------- Toggle switch (Alertas: activar/desactivar regla) ---------- */
+
+.toggle-switch{
+    position: relative;
+    display: inline-block;
+    width: 38px;
+    height: 22px;
+}
+.toggle-switch input{
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.toggle-switch span{
+    position: absolute;
+    inset: 0;
+    background: var(--border);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background .15s ease;
+}
+.toggle-switch span::before{
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    left: 3px;
+    top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform .15s ease;
+}
+.toggle-switch input:checked + span{ background: var(--success, var(--primary)); }
+.toggle-switch input:checked + span::before{ transform: translateX(16px); }
 
 /* ---------- Paginación numérica ---------- */
 

@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}Alertas · Utopialand WebUI{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <div>
+        <h1>🔔 Alertas</h1>
+        <p class="page-subtitle">Reglas para vigilar eventos sensibles (beacons, TNT, contenedores...).</p>
+    </div>
+    <span class="badge badge-warning">Infraestructura lista · envío a Discord pendiente de activar</span>
+</header>
+
+<section class="card">
+    <p class="muted-text" style="margin-bottom: 4px;">
+        Estas reglas ya buscan coincidencias reales en tus registros (usa "Vista previa" para comprobarlo).
+        El campo de webhook de Discord se guarda para cuando decidas activar el envío automático — hoy no se dispara solo.
+    </p>
+</section>
+
+<section class="card">
+    <div class="card-header"><h3>➕ Nueva regla</h3></div>
+
+    {% if presets %}
+    <div class="chip-list" style="margin-bottom: 14px;">
+        {% for p in presets %}
+        <button type="button" class="chip alert-preset" data-preset-name="{{ p.name }}" data-preset-pattern="{{ p.block_pattern }}">
+            {{ p.name }}
+        </button>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <form id="alert-form" class="filters-grid">
+        <div class="field">
+            <label for="a-name">Nombre de la regla</label>
+            <input id="a-name" name="name" type="text" placeholder="Ej. Romper beacon" required>
+        </div>
+        <div class="field">
+            <label for="a-types">Tipos de evento</label>
+            <select id="a-types" name="types" multiple size="4">
+                {% for t in event_types %}
+                <option value="{{ t }}">{{ t }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="field">
+            <label for="a-pattern">Patrón de bloque/objeto (opcional)</label>
+            <input id="a-pattern" name="pattern" type="text" placeholder="%beacon%, %tnt%...">
+        </div>
+        <div class="field">
+            <label for="a-webhook">Webhook de Discord (opcional, para más adelante)</label>
+            <input id="a-webhook" name="webhook" type="url" placeholder="https://discord.com/api/webhooks/...">
+        </div>
+        <div class="field field-actions">
+            <button type="submit" class="btn btn-primary">Crear regla</button>
+        </div>
+    </form>
+</section>
+
+<section class="card">
+    <div class="card-header"><h3>Reglas configuradas <span id="rules-count" class="badge badge-muted"></span></h3></div>
+    <div id="rules-list"><p class="table-empty">Cargando reglas…</p></div>
+</section>
+
+<div id="alert-preview-modal" class="modal-backdrop" hidden>
+    <div class="modal modal-lg">
+        <div class="modal-header">
+            <h3 id="alert-preview-title">Vista previa</h3>
+            <button class="modal-close" id="alert-preview-close" aria-label="Cerrar">✕</button>
+        </div>
+        <div class="modal-body" id="alert-preview-body"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/alerts.js') }}"></script>
+{% endblock %}

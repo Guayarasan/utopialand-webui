@@ -10,6 +10,16 @@
 </header>
 
 <section class="card">
+    <div class="card-header">
+        <h3>⭐ Lugares guardados</h3>
+        <button type="button" class="btn btn-outline btn-sm" id="btn-save-location">+ Guardar estas coordenadas</button>
+    </div>
+    <div id="favorite-locations" class="chip-list">
+        <span class="muted-text">Cargando…</span>
+    </div>
+</section>
+
+<section class="card">
     <form id="coord-form" class="filters-grid">
         <div class="field">
             <label for="c-x">X</label>
@@ -66,10 +76,11 @@
                 <th>Coordenadas</th>
                 <th>Distancia</th>
                 <th>Mundo</th>
+                <th></th>
             </tr>
             </thead>
             <tbody id="coord-tbody">
-            <tr><td colspan="7" class="table-empty">Introduce coordenadas y pulsa "Buscar cerca".</td></tr>
+            <tr><td colspan="8" class="table-empty">Introduce coordenadas y pulsa "Buscar cerca".</td></tr>
             </tbody>
         </table>
     </div>

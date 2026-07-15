@@ -15,12 +15,13 @@
         <div class="card-header">
             <h3>Editor</h3>
             <div class="table-controls">
+                <button id="btn-copy-sql" class="btn btn-outline btn-sm" title="Copiar la consulta actual">📋 Copiar</button>
                 <button id="btn-save-favorite" class="btn btn-outline btn-sm">⭐ Guardar</button>
                 <button id="btn-run-sql" class="btn btn-primary btn-sm">▶ Ejecutar</button>
             </div>
         </div>
         <textarea id="sql-editor" class="sql-textarea" spellcheck="false" placeholder="SELECT * FROM LOGDATA ORDER BY time DESC LIMIT 100"></textarea>
-        <p class="muted-text">Atajo: Ctrl/Cmd + Enter para ejecutar.</p>
+        <p class="muted-text">Atajo: Ctrl/Cmd + Enter para ejecutar · Ctrl/Cmd + Espacio para autocompletar.</p>
 
         <div id="sql-result-meta" class="sql-result-meta"></div>
         <div class="table-wrapper">
@@ -47,6 +48,18 @@
         </section>
     </aside>
 </div>
+{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/sql/sql.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/sql-hint.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
 {% endblock %}
 
 {% block extra_scripts %}

@@ -30,6 +30,7 @@
         <a href="/estadisticas" class="{{ 'active' if request.path == '/estadisticas' else '' }}">📈 <span>Estadísticas</span></a>
         {% if current_user and current_user.role in ('admin', 'moderator') %}
         <a href="/sql" class="{{ 'active' if request.path == '/sql' else '' }}">🗄 <span>SQL</span></a>
+        <a href="/alertas" class="{{ 'active' if request.path == '/alertas' else '' }}">🔔 <span>Alertas</span></a>
         {% endif %}
         {% if current_user and current_user.role == 'admin' %}
         <a href="/usuarios" class="{{ 'active' if request.path == '/usuarios' else '' }}">🛡 <span>Usuarios</span></a>

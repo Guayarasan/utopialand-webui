@@ -66,17 +66,53 @@ SCHEMA_STATEMENTS = [
         created_at INT NOT NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     """,
+    """
+    CREATE TABLE IF NOT EXISTS webui_favorite_locations (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        name VARCHAR(120) NOT NULL,
+        world VARCHAR(80) NULL,
+        pos_x DOUBLE NOT NULL,
+        pos_y DOUBLE NOT NULL,
+        pos_z DOUBLE NOT NULL,
+        icon VARCHAR(8) NULL,
+        created_at INT NOT NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS webui_alert_rules (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        name VARCHAR(120) NOT NULL,
+        event_types VARCHAR(255) NOT NULL,
+        block_pattern VARCHAR(120) NULL,
+        enabled TINYINT(1) NOT NULL DEFAULT 1,
+        discord_webhook_url VARCHAR(500) NULL,
+        last_triggered_at INT NULL,
+        created_at INT NOT NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    """,
+]
+
+# Columnas añadidas a tablas ya existentes en instalaciones previas.
+# CREATE TABLE IF NOT EXISTS no modifica una tabla que ya existe, así
+# que las columnas nuevas necesitan una migración explícita e
+# idempotente (se revisa INFORMATION_SCHEMA antes de cada ALTER).
+COLUMN_MIGRATIONS = [
+    ("webui_saved_queries", "category", "VARCHAR(60) NULL DEFAULT NULL AFTER name"),
 ]
 
 EXAMPLE_QUERIES = [
     (
         "Actividad reciente (últimas 24h)",
+        "Actividad general",
         "SELECT name, type, obj_name, world, FROM_UNIXTIME(time) AS fecha\n"
         f"FROM {Config.DB_TABLE}\nWHERE time >= UNIX_TIMESTAMP(NOW()) - 86400\n"
         "ORDER BY time DESC\nLIMIT 200",
     ),
     (
         "Posible grief (bloques rotos, excluyendo staff)",
+        "Investigación",
         f"SELECT name, obj_name, world, pos_x, pos_y, pos_z, FROM_UNIXTIME(time) AS fecha\n"
         f"FROM {Config.DB_TABLE}\nWHERE type = 'block_break'\n"
         "  AND name NOT IN ('Admin1', 'Mod1')\n"
@@ -84,12 +120,14 @@ EXAMPLE_QUERIES = [
     ),
     (
         "Posible robo (recogida de items de cofres/entidades)",
+        "Investigación",
         f"SELECT name, obj_name, world, pos_x, pos_y, pos_z, FROM_UNIXTIME(time) AS fecha\n"
         f"FROM {Config.DB_TABLE}\nWHERE type = 'player_pickup_item'\n"
         "ORDER BY time DESC\nLIMIT 200",
     ),
     (
         "Actividad por coordenadas (radio de 50 bloques)",
+        "Investigación",
         f"SELECT name, type, obj_name, pos_x, pos_y, pos_z, FROM_UNIXTIME(time) AS fecha\n"
         f"FROM {Config.DB_TABLE}\n"
         "WHERE pos_x BETWEEN 0 AND 100 AND pos_y BETWEEN 0 AND 100 AND pos_z BETWEEN 0 AND 100\n"
@@ -97,6 +135,7 @@ EXAMPLE_QUERIES = [
     ),
     (
         "Actividad entre dos fechas",
+        "Actividad general",
         f"SELECT name, type, obj_name, world, FROM_UNIXTIME(time) AS fecha\n"
         f"FROM {Config.DB_TABLE}\n"
         "WHERE time BETWEEN UNIX_TIMESTAMP('2026-01-01 00:00:00')\n"
@@ -105,6 +144,7 @@ EXAMPLE_QUERIES = [
     ),
     (
         "Jugadores con más bloques rotos (top 20)",
+        "Rankings",
         f"SELECT name, COUNT(*) AS total_breaks\nFROM {Config.DB_TABLE}\n"
         "WHERE type = 'block_break'\nGROUP BY name\nORDER BY total_breaks DESC\nLIMIT 20",
     ),
@@ -136,6 +176,16 @@ def _create_schema():
         with conn.cursor() as cur:
             for statement in SCHEMA_STATEMENTS:
                 cur.execute(statement)
+            for table, column, ddl in COLUMN_MIGRATIONS:
+                cur.execute(
+                    "SELECT COUNT(*) AS total FROM INFORMATION_SCHEMA.COLUMNS "
+                    "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = %s AND COLUMN_NAME = %s",
+                    (table, column),
+                )
+                exists = (cur.fetchone() or {}).get("total", 0)
+                if not exists:
+                    cur.execute(f"ALTER TABLE {table} ADD COLUMN {column} {ddl}")
+                    logger.info("Migración aplicada: %s.%s", table, column)
     finally:
         conn.close()
 
@@ -181,11 +231,11 @@ def _ensure_example_queries():
     conn = get_connection()
     try:
         with conn.cursor() as cur:
-            for name, sql_text in EXAMPLE_QUERIES:
+            for name, category, sql_text in EXAMPLE_QUERIES:
                 cur.execute(
-                    "INSERT INTO webui_saved_queries (user_id, name, sql_text, is_example, created_at) "
-                    "VALUES (NULL, %s, %s, 1, %s)",
-                    (name, sql_text, now_unix()),
+                    "INSERT INTO webui_saved_queries (user_id, name, category, sql_text, is_example, created_at) "
+                    "VALUES (NULL, %s, %s, %s, 1, %s)",
+                    (name, category, sql_text, now_unix()),
                 )
     finally:
         conn.close()
