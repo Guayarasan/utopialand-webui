@@ -1,13 +1,31 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="{{ appearance.theme if appearance else 'dark' }}" data-anim="{{ ('off' if appearance and not appearance.animations_enabled else (appearance.animation_speed if appearance else 'normal')) }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{% block title %}Utopialand WebUI{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% if appearance_css_vars %}
+<style id="appearance-overrides">
+:root{
+    {% for name, value in appearance_css_vars.items() %}{{ name }}: {{ value | safe }};
+    {% endfor %}
+}
+</style>
+{% endif %}
 {% block extra_head %}{% endblock %}
 </head>
 <body>
+
+{% if appearance and (appearance.bg_image_url or appearance.bg_opacity > 0) %}
+<div class="appearance-bg" style="
+    {% if appearance.bg_image_url %}background-image: url('{{ appearance.bg_image_url | replace("'", "%27") }}');{% endif %}
+    filter: blur(var(--bg-blur));
+    opacity: var(--bg-opacity);
+"></div>
+{% endif %}
 
 <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Abrir menú">☰</button>
 <div id="sidebar-overlay" class="sidebar-overlay"></div>
@@ -32,6 +50,7 @@
         <a href="/sql" class="{{ 'active' if request.path == '/sql' else '' }}">🗄 <span>SQL</span></a>
         <a href="/alertas" class="{{ 'active' if request.path == '/alertas' else '' }}">🔔 <span>Alertas</span></a>
         {% endif %}
+        <a href="/apariencia" class="{{ 'active' if request.path == '/apariencia' else '' }}">🎨 <span>Apariencia</span></a>
         {% if current_user and current_user.role == 'admin' %}
         <a href="/usuarios" class="{{ 'active' if request.path == '/usuarios' else '' }}">🛡 <span>Usuarios</span></a>
         {% endif %}

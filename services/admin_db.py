@@ -92,6 +92,13 @@ SCHEMA_STATEMENTS = [
         created_at INT NOT NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     """,
+    """
+    CREATE TABLE IF NOT EXISTS webui_appearance_settings (
+        user_id INT PRIMARY KEY,
+        settings_json TEXT NOT NULL,
+        updated_at INT NOT NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    """,
 ]
 
 # Columnas añadidas a tablas ya existentes en instalaciones previas.

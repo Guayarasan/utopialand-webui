@@ -26,6 +26,16 @@ def create_app():
     def inject_current_user():
         return {"current_user": current_user()}
 
+    @app.context_processor
+    def inject_appearance():
+        from services import appearance as appearance_service
+        user = current_user()
+        try:
+            settings = appearance_service.get_settings(user["id"]) if user else dict(appearance_service.DEFAULTS)
+        except Exception:  # noqa: BLE001 -- nunca romper el render por esto (DB aún no lista, etc.)
+            settings = dict(appearance_service.DEFAULTS)
+        return {"appearance": settings, "appearance_css_vars": appearance_service.css_variables(settings)}
+
     register_blueprints(app)
     register_error_handlers(app)
 
@@ -68,10 +78,12 @@ def register_blueprints(app):
     from routes.users import bp as users_bp
     from routes.sql_console import bp as sql_bp
     from routes.alerts import bp as alerts_bp
+    from routes.appearance import bp as appearance_bp
 
     blueprints = (
         auth_bp, dashboard_bp, records_bp, players_bp, blocks_bp,
         coordinates_bp, stats_bp, config_bp, users_bp, sql_bp, alerts_bp,
+        appearance_bp,
     )
     for bp in blueprints:
         app.register_blueprint(bp)

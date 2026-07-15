@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% block title %}Apariencia · Utopialand WebUI{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <div>
+        <h1>🎨 Apariencia</h1>
+        <p class="page-subtitle">Personaliza colores, tipografía, fondo y animaciones. Se guarda en tu cuenta.</p>
+    </div>
+    <button type="button" id="btn-reset-appearance" class="btn btn-outline btn-sm">↺ Restablecer</button>
+</header>
+
+<div class="appearance-layout">
+    <div>
+        <section class="card">
+            <div class="card-header"><h3>Tema y color</h3></div>
+
+            <div class="appearance-field">
+                <label>Tema</label>
+                <div class="quick-dates">
+                    <button type="button" class="btn btn-sm btn-outline" data-set="theme" data-value="dark">🌙 Oscuro</button>
+                    <button type="button" class="btn btn-sm btn-outline" data-set="theme" data-value="light">☀️ Claro</button>
+                </div>
+            </div>
+
+            <div class="appearance-field">
+                <label for="a-primary">Color principal</label>
+                <input type="color" id="a-primary" data-set="primary_color">
+                <div class="appearance-preset-swatches">
+                    {% for c in ["#5b8cff", "#a78bfa", "#34d399", "#fb923c", "#f472b6", "#22d3ee"] %}
+                    <span class="swatch" style="background:{{ c }}" data-set="primary_color" data-value="{{ c }}"></span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="appearance-row">
+                <div class="appearance-field">
+                    <label for="a-grad-from">Gradiente — desde</label>
+                    <input type="color" id="a-grad-from" data-set="bg_gradient_from">
+                </div>
+                <div class="appearance-field">
+                    <label for="a-grad-to">Gradiente — hasta</label>
+                    <input type="color" id="a-grad-to" data-set="bg_gradient_to">
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="card-header"><h3>Fondo</h3></div>
+            <div class="appearance-field">
+                <label for="a-bg-image">Imagen de fondo (URL, opcional)</label>
+                <input type="url" id="a-bg-image" data-set="bg_image_url" placeholder="https://...">
+            </div>
+            <div class="appearance-row">
+                <div class="appearance-field">
+                    <label for="a-blur">Blur (<span id="a-blur-val"></span>px)</label>
+                    <input type="range" id="a-blur" data-set="bg_blur" min="0" max="30" step="1">
+                </div>
+                <div class="appearance-field">
+                    <label for="a-opacity">Intensidad (<span id="a-opacity-val"></span>%)</label>
+                    <input type="range" id="a-opacity" data-set="bg_opacity" min="0" max="100" step="5">
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="card-header"><h3>Tipografía y forma</h3></div>
+            <div class="appearance-field">
+                <label for="a-font">Tipografía</label>
+                <select id="a-font" data-set="font_family">
+                    {% for key, css_value in font_options.items() %}
+                    <option value="{{ key }}">{{ key | capitalize }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="appearance-row">
+                <div class="appearance-field">
+                    <label for="a-radius">Bordes</label>
+                    <select id="a-radius" data-set="radius_scale">
+                        {% for r in radius_options %}
+                        <option value="{{ r }}">{{ r | upper }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="appearance-field">
+                    <label for="a-density">Densidad</label>
+                    <select id="a-density" data-set="density">
+                        {% for d in density_options %}
+                        <option value="{{ d }}">{{ d | capitalize }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="card-header"><h3>Animaciones</h3></div>
+            <div class="appearance-field">
+                <label class="toggle-switch">
+                    <input type="checkbox" id="a-animations-enabled" data-set="animations_enabled">
+                    <span></span>
+                </label>
+                <span style="margin-left:10px; font-size:13px; vertical-align:middle;">Activar animaciones</span>
+            </div>
+            <div class="appearance-field">
+                <label for="a-speed">Velocidad</label>
+                <select id="a-speed" data-set="animation_speed">
+                    {% for s in speed_options %}
+                    <option value="{{ s }}">{{ s | capitalize }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </section>
+
+        <button type="button" id="btn-save-appearance" class="btn btn-primary" style="width:100%;">💾 Guardar cambios</button>
+    </div>
+
+    <div class="appearance-preview">
+        <h3 style="margin-bottom:14px; font-size:13.5px; color:var(--text-muted);">Vista previa en vivo</h3>
+        <section class="card">
+            <div class="card-header">
+                <h3>Actividad reciente</h3>
+                <span class="badge badge-primary">Ejemplo</span>
+            </div>
+            <div class="feed-item">
+                <div class="feed-main">
+                    <span class="feed-title"><strong>Steve</strong> <span class="badge badge-danger">block_break</span> <span class="feed-object">Beacon</span></span>
+                    <span class="feed-meta">overworld · 120/64/-30</span>
+                </div>
+                <span class="feed-time">hace 2 min</span>
+            </div>
+            <div class="feed-item">
+                <div class="feed-main">
+                    <span class="feed-title"><strong>Alex</strong> <span class="badge badge-success">block_place</span> <span class="feed-object">Piedra</span></span>
+                    <span class="feed-meta">nether · 12/70/8</span>
+                </div>
+                <span class="feed-time">hace 9 min</span>
+            </div>
+            <div class="field-actions" style="margin-top:16px;">
+                <button type="button" class="btn btn-primary btn-sm">Botón primario</button>
+                <button type="button" class="btn btn-outline btn-sm">Botón secundario</button>
+                <span class="chip">📍 Spawn</span>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>window.__APPEARANCE_INITIAL__ = {{ settings | tojson }};</script>
+<script src="{{ url_for('static', filename='js/appearance.js') }}"></script>
+{% endblock %}
