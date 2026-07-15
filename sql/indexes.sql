@@ -38,3 +38,16 @@ ALTER TABLE LOGDATA ADD INDEX idx_logdata_world_pos (world, pos_x, pos_y, pos_z)
 -- ============================================================================
 ALTER TABLE webui_query_history ADD INDEX idx_history_user_time (user_id, executed_at);
 ALTER TABLE webui_saved_filters ADD INDEX idx_filters_user_page (user_id, page);
+
+-- ============================================================================
+-- Añadidos en la mejora integral (Fases 1-5): las consultas de Bloques,
+-- Dashboard y la ficha de Jugadores ahora agrupan por
+-- COALESCE(NULLIF(obj_name,''), obj_id) para corregir el bug de bloques
+-- "Desconocido" -- un índice sobre obj_id acelera esa parte cuando
+-- obj_name viene vacío.
+-- ============================================================================
+ALTER TABLE LOGDATA ADD INDEX idx_logdata_objid (obj_id);
+
+-- Tablas nuevas de la WebUI (favoritos de coordenadas y reglas de alertas).
+ALTER TABLE webui_favorite_locations ADD INDEX idx_favlocations_user (user_id);
+ALTER TABLE webui_alert_rules ADD INDEX idx_alertrules_user (user_id);

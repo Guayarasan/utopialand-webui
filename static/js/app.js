@@ -80,6 +80,18 @@
         return `<span class="type-badge">${escapeHTML(type || "-")}</span>`;
     }
 
+    // ---------- identidad de bloque/entidad (obj_name con fallback a obj_id) ----------
+    // Centralizado aquí porque blocks.js, players.js, dashboard.js e
+    // investigation.js necesitaban exactamente la misma lógica.
+    function blockLabel(row) {
+        const raw = (row.obj_name && String(row.obj_name).trim())
+            || (row.obj_id !== null && row.obj_id !== undefined && String(row.obj_id).trim())
+            || "";
+        if (!raw) return null;
+        const shortName = raw.includes(":") ? raw.split(":").slice(1).join(":") : raw;
+        return shortName.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+    }
+
     function buildQueryString(params) {
         const search = new URLSearchParams();
         Object.entries(params).forEach(([key, value]) => {
@@ -122,6 +134,7 @@
         formatNumber,
         escapeHTML,
         typeBadge,
+        blockLabel,
         buildQueryString,
         setupModal,
     };

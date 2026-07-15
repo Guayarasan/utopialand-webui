@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block title %}Modo Investigación · Utopialand WebUI{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <div>
+        <h1>🕵 Modo Investigación</h1>
+        <p class="page-subtitle">Informe cronológico de un jugador y/o una zona, sin escribir SQL.</p>
+    </div>
+</header>
+
+<section class="card">
+    <form id="inv-form" class="filters-grid">
+        <div class="field">
+            <label for="i-player">Jugador (opcional)</label>
+            <input id="i-player" name="player" type="text" placeholder="Nombre exacto o parcial">
+        </div>
+        <div class="field">
+            <label for="i-world">Mundo</label>
+            <select id="i-world" name="world">
+                <option value="">Todos</option>
+                {% for w in worlds %}
+                <option value="{{ w }}">{{ w }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="field">
+            <label for="i-x">X</label>
+            <input id="i-x" name="x" type="number" step="any">
+        </div>
+        <div class="field">
+            <label for="i-y">Y</label>
+            <input id="i-y" name="y" type="number" step="any">
+        </div>
+        <div class="field">
+            <label for="i-z">Z</label>
+            <input id="i-z" name="z" type="number" step="any">
+        </div>
+        <div class="field">
+            <label for="i-radius">Radio</label>
+            <input id="i-radius" name="radius" type="number" step="any" value="50">
+        </div>
+        <div class="field">
+            <label for="i-date-from">Desde</label>
+            <input id="i-date-from" name="date_from_local" type="datetime-local">
+        </div>
+        <div class="field">
+            <label for="i-date-to">Hasta</label>
+            <input id="i-date-to" name="date_to_local" type="datetime-local">
+        </div>
+        <div class="field field-actions">
+            <button type="submit" class="btn btn-primary">🔍 Generar informe</button>
+        </div>
+    </form>
+    <p class="muted-text">Indica al menos un jugador, o unas coordenadas con radio, para generar el informe.</p>
+</section>
+
+<div id="inv-results" hidden>
+    <section class="stat-grid" id="inv-summary-stats"></section>
+
+    <div class="grid-2">
+        <section class="card">
+            <div class="card-header"><h3>Por categoría</h3></div>
+            <div id="inv-categories" class="rank-list"></div>
+        </section>
+        <section class="card">
+            <div class="card-header"><h3>Jugadores y mundos involucrados</h3></div>
+            <div id="inv-players-worlds"></div>
+        </section>
+    </div>
+
+    <section class="card">
+        <div class="card-header">
+            <h3>Línea de tiempo <span id="inv-count" class="badge badge-muted"></span></h3>
+            <button type="button" id="btn-export-inv" class="btn btn-outline btn-sm">⬇ Exportar CSV</button>
+        </div>
+        <div id="inv-timeline" class="activity-feed" style="max-height: 600px;"></div>
+    </section>
+</div>
+
+<div id="inv-empty" class="empty-state">
+    <div class="empty-state-icon">🕵</div>
+    <h2>Configura tu investigación</h2>
+    <p>Elige un jugador, una zona, o ambos, y genera el informe cronológico.</p>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/investigation.js') }}"></script>
+{% endblock %}

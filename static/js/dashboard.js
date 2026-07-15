@@ -1,6 +1,6 @@
 (function () {
     "use strict";
-    const { fetchJSON, formatNumber, escapeHTML, typeBadge, toast } = window.Utopialand;
+    const { fetchJSON, formatNumber, escapeHTML, typeBadge, toast, blockLabel } = window.Utopialand;
 
     const REFRESH_MS = 60000;
 
@@ -11,13 +11,6 @@
         if (diff < 3600) return `hace ${Math.floor(diff / 60)} min`;
         if (diff < 86400) return `hace ${Math.floor(diff / 3600)} h`;
         return `hace ${Math.floor(diff / 86400)} d`;
-    }
-
-    function blockLabel(row) {
-        const raw = (row.obj_name && String(row.obj_name).trim()) || (row.obj_id !== null && row.obj_id !== undefined ? String(row.obj_id) : "");
-        if (!raw) return null;
-        const shortName = raw.includes(":") ? raw.split(":").slice(1).join(":") : raw;
-        return shortName.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
     }
 
     function feedItemHTML(row) {

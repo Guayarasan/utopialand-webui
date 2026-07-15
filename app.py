@@ -79,11 +79,12 @@ def register_blueprints(app):
     from routes.sql_console import bp as sql_bp
     from routes.alerts import bp as alerts_bp
     from routes.appearance import bp as appearance_bp
+    from routes.investigation import bp as investigation_bp
 
     blueprints = (
         auth_bp, dashboard_bp, records_bp, players_bp, blocks_bp,
         coordinates_bp, stats_bp, config_bp, users_bp, sql_bp, alerts_bp,
-        appearance_bp,
+        appearance_bp, investigation_bp,
     )
     for bp in blueprints:
         app.register_blueprint(bp)

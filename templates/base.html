@@ -45,6 +45,7 @@
         <a href="/jugadores" class="{{ 'active' if request.path == '/jugadores' else '' }}">👤 <span>Jugadores</span></a>
         <a href="/bloques" class="{{ 'active' if request.path == '/bloques' else '' }}">🧱 <span>Bloques</span></a>
         <a href="/coordenadas" class="{{ 'active' if request.path == '/coordenadas' else '' }}">📍 <span>Coordenadas</span></a>
+        <a href="/investigacion" class="{{ 'active' if request.path == '/investigacion' else '' }}">🕵 <span>Investigación</span></a>
         <a href="/estadisticas" class="{{ 'active' if request.path == '/estadisticas' else '' }}">📈 <span>Estadísticas</span></a>
         {% if current_user and current_user.role in ('admin', 'moderator') %}
         <a href="/sql" class="{{ 'active' if request.path == '/sql' else '' }}">🗄 <span>SQL</span></a>

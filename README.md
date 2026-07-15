@@ -112,6 +112,31 @@ gunicorn app:app
 
 `time` es un Unix timestamp. No se usan columnas fuera de esta lista.
 
-Las tablas `webui_users`, `webui_saved_queries`, `webui_query_history` y
-`webui_saved_filters` son metadata propia de la aplicación (usuarios,
-consultas e historial), completamente independientes de `LOGDATA`.
+Las tablas `webui_users`, `webui_saved_queries`, `webui_query_history`,
+`webui_saved_filters`, `webui_favorite_locations`, `webui_alert_rules` y
+`webui_appearance_settings` son metadata propia de la aplicación (usuarios,
+consultas e historial, favoritos, reglas de alertas, preferencias visuales),
+completamente independientes de `LOGDATA`. Se crean solas en el primer
+arranque (`services/admin_db.py`), incluyendo migraciones de columnas nuevas
+sobre tablas que ya existieran de una instalación previa.
+
+## Novedades de la mejora integral
+
+- **Bloques**: corregido el bug de raíz que mostraba "Desconocido" (agrupación
+  por `COALESCE(NULLIF(obj_name,''), obj_id)`), más un modal de detalle por
+  bloque con estadísticas completas.
+- **Dashboard**: widgets en vivo (actividad reciente, jugadores activos,
+  bloques más modificados, explosiones, muertes, eventos importantes),
+  auto-refresco cada 60s.
+- **Jugadores**: ficha enriquecida con gráficos de actividad diaria/por hora,
+  rankings de bloques/entidades y zonas frecuentes.
+- **Coordenadas**: lugares favoritos guardados por usuario.
+- **Registros**: búsqueda instantánea, filtros recientes, acciones rápidas de
+  coordenadas (copiar / buscar por radio).
+- **Consola SQL**: editor con resaltado de sintaxis y autocompletado
+  (CodeMirror), categorías en consultas guardadas, copiar consulta.
+- **Alertas**: reglas de vigilancia con vista previa contra datos reales;
+  infraestructura de envío a Discord preparada (no activada aún).
+- **Apariencia**: tema, color, fondo, tipografía, densidad y animaciones
+  personalizables y guardados por usuario en la base de datos.
+- **Modo Investigación**: informe cronológico por jugador y/o zona, sin SQL.

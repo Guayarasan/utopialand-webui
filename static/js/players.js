@@ -1,6 +1,6 @@
 (function () {
     "use strict";
-    const { toast, fetchJSON, formatNumber, escapeHTML, buildQueryString, setupModal, debounce, typeBadge } = window.Utopialand;
+    const { toast, fetchJSON, formatNumber, escapeHTML, buildQueryString, setupModal, debounce, typeBadge, blockLabel: sharedBlockLabel } = window.Utopialand;
 
     const searchInput = document.getElementById("p-search");
     const sortSelect = document.getElementById("p-sort");
@@ -75,10 +75,7 @@
     // -------- Ficha del jugador --------
 
     function blockLabel(row) {
-        const raw = (row.obj_name && String(row.obj_name).trim()) || (row.obj_id !== null && row.obj_id !== undefined ? String(row.obj_id) : "");
-        if (!raw) return "Desconocido";
-        const shortName = raw.includes(":") ? raw.split(":").slice(1).join(":") : raw;
-        return shortName.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+        return sharedBlockLabel(row) || "Desconocido";
     }
 
     function rankListHTML(rows, valueKey, labelFn) {
