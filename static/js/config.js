@@ -54,4 +54,38 @@
             }
         });
     }
+
+    const saveUserTzBtn = document.getElementById("btn-save-user-tz");
+    if (saveUserTzBtn) {
+        saveUserTzBtn.addEventListener("click", async () => {
+            try {
+                await fetchJSON("/api/config/zona-horaria/mia", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ timezone: document.getElementById("tz-user").value }),
+                });
+                toast("Zona horaria guardada", "success");
+                window.location.reload();
+            } catch (err) {
+                toast(err.message, "error");
+            }
+        });
+    }
+
+    const saveAppTzBtn = document.getElementById("btn-save-app-tz");
+    if (saveAppTzBtn) {
+        saveAppTzBtn.addEventListener("click", async () => {
+            try {
+                await fetchJSON("/api/config/zona-horaria/app", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ timezone: document.getElementById("tz-app").value }),
+                });
+                toast("Zona horaria de la aplicación guardada", "success");
+                window.location.reload();
+            } catch (err) {
+                toast(err.message, "error");
+            }
+        });
+    }
 })();

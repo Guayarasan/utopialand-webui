@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, render_template
 from database import DatabaseNotConfigured, check_connection
 from services import dashboard as dashboard_service
 from services import stats
-from utils.formatting import unix_to_readable
+from utils.formatting import current_utc_offset_sql, unix_to_readable
 from utils.security import login_required
 
 bp = Blueprint("dashboard", __name__)
@@ -86,6 +86,6 @@ def api_eventos_importantes():
 @login_required
 def api_resumen():
     overview = stats.get_overview()
-    overview["today_calendar"] = dashboard_service.get_today_calendar_count()
+    overview["today_calendar"] = dashboard_service.get_today_calendar_count(tz_offset=current_utc_offset_sql())
     overview["last_event_time_fmt"] = unix_to_readable(overview.get("last_event_time"))
     return jsonify(overview)

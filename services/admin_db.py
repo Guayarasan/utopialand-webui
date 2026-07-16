@@ -99,6 +99,12 @@ SCHEMA_STATEMENTS = [
         updated_at INT NOT NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     """,
+    """
+    CREATE TABLE IF NOT EXISTS webui_app_settings (
+        setting_key VARCHAR(60) PRIMARY KEY,
+        value VARCHAR(255) NOT NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    """,
 ]
 
 # Columnas añadidas a tablas ya existentes en instalaciones previas.
@@ -107,6 +113,7 @@ SCHEMA_STATEMENTS = [
 # idempotente (se revisa INFORMATION_SCHEMA antes de cada ALTER).
 COLUMN_MIGRATIONS = [
     ("webui_saved_queries", "category", "VARCHAR(60) NULL DEFAULT NULL AFTER name"),
+    ("webui_users", "timezone", "VARCHAR(60) NULL DEFAULT NULL AFTER role"),
 ]
 
 EXAMPLE_QUERIES = [

@@ -11,7 +11,7 @@ from config import Config
 from database import fetch_all
 from services.query_builder import TABLE
 from utils.cache import cached
-from utils.formatting import now_unix
+from utils.formatting import current_utc_offset_sql, now_unix
 
 # Vista previa de "eventos importantes": explosiones, muertes de
 # entidades y colocación de bloques sensibles (TNT / lava). La Fase 3
@@ -105,11 +105,15 @@ def get_important_events(limit=10):
 
 
 @cached(Config.CACHE_TTL_SECONDS)
-def get_today_calendar_count():
+def get_today_calendar_count(tz_offset=None):
+    """Eventos del día calendario "hoy" en la zona horaria de
+    visualización -- no la del servidor de MySQL."""
+    tz_offset = tz_offset or current_utc_offset_sql()
     sql = f"""
         SELECT COUNT(*) AS total
         FROM {TABLE}
-        WHERE DATE(FROM_UNIXTIME(time)) = CURDATE()
+        WHERE DATE(CONVERT_TZ(FROM_UNIXTIME(time), '+00:00', %s))
+            = DATE(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', %s))
     """
-    rows = fetch_all(sql)
+    rows = fetch_all(sql, [tz_offset, tz_offset])
     return rows[0]["total"] if rows else 0

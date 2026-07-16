@@ -140,3 +140,9 @@ sobre tablas que ya existieran de una instalación previa.
 - **Apariencia**: tema, color, fondo, tipografía, densidad y animaciones
   personalizables y guardados por usuario en la base de datos.
 - **Modo Investigación**: informe cronológico por jugador y/o zona, sin SQL.
+- **Zona horaria**: la base de datos sigue guardando todo en UTC; ahora
+  Configuración permite elegir una zona horaria de la aplicación (para
+  todos) y cada usuario puede fijar la suya propia, que tiene prioridad.
+  Afecta a todas las fechas mostradas (Registros, Estadísticas, Dashboard,
+  modales, Alertas, ficha de Jugador...), incluyendo las agregaciones por
+  día/hora que antes usaban la zona horaria de la sesión de MySQL.

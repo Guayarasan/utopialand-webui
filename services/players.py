@@ -4,6 +4,7 @@ from database import fetch_all, fetch_one
 from services.query_builder import (
     TABLE, Filters, build_where_sql, clamp_limit, clamp_offset,
 )
+from utils.formatting import current_utc_offset_sql
 
 # Mismos tipos que ya se usaban para el contador "combat" en get_players.
 # Si tu instalación de Tianyan usa nombres de evento distintos para
@@ -68,6 +69,7 @@ def get_players(args):
 
 
 def get_player_summary(name):
+    tz_offset = current_utc_offset_sql()
     sql = f"""
         SELECT
             name,
@@ -78,12 +80,12 @@ def get_player_summary(name):
             MAX(time) AS last_seen,
             MIN(time) AS first_seen,
             COUNT(DISTINCT world) AS worlds_visited,
-            COUNT(DISTINCT DATE(FROM_UNIXTIME(time))) AS active_days
+            COUNT(DISTINCT DATE(CONVERT_TZ(FROM_UNIXTIME(time), '+00:00', %s))) AS active_days
         FROM {TABLE}
         WHERE name = %s
         GROUP BY name
     """
-    return fetch_one(sql, list(COMBAT_TYPES) + [name])
+    return fetch_one(sql, list(COMBAT_TYPES) + [tz_offset, name])
 
 
 def get_player_activity(name, args, limit=None):
@@ -120,27 +122,31 @@ def get_player_type_breakdown(name):
 
 
 def get_player_daily_activity(name, days=30):
-    """Serie diaria de actividad (para el gráfico de línea de la ficha)."""
+    """Serie diaria de actividad (para el gráfico de línea de la ficha),
+    en la zona horaria de visualización."""
+    tz_offset = current_utc_offset_sql()
     sql = f"""
-        SELECT DATE(FROM_UNIXTIME(time)) AS day, COUNT(*) AS total
+        SELECT DATE(CONVERT_TZ(FROM_UNIXTIME(time), '+00:00', %s)) AS day, COUNT(*) AS total
         FROM {TABLE}
         WHERE name = %s AND time >= UNIX_TIMESTAMP(NOW()) - (%s * 86400)
         GROUP BY day
         ORDER BY day ASC
     """
-    return fetch_all(sql, [name, days])
+    return fetch_all(sql, [tz_offset, name, days])
 
 
 def get_player_hourly_activity(name):
-    """Distribución de actividad por hora del día (0-23), todo el historial."""
+    """Distribución de actividad por hora del día (0-23), todo el
+    historial, en la zona horaria de visualización."""
+    tz_offset = current_utc_offset_sql()
     sql = f"""
-        SELECT HOUR(FROM_UNIXTIME(time)) AS hour, COUNT(*) AS total
+        SELECT HOUR(CONVERT_TZ(FROM_UNIXTIME(time), '+00:00', %s)) AS hour, COUNT(*) AS total
         FROM {TABLE}
         WHERE name = %s
         GROUP BY hour
         ORDER BY hour ASC
     """
-    rows = fetch_all(sql, [name])
+    rows = fetch_all(sql, [tz_offset, name])
     by_hour = {r["hour"]: r["total"] for r in rows}
     return [{"hour": h, "total": by_hour.get(h, 0)} for h in range(24)]
 

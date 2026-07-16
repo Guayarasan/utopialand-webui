@@ -1,6 +1,6 @@
 import logging
 
-from flask import Flask, jsonify, redirect, request, session, url_for
+from flask import Flask, g, jsonify, redirect, request, session, url_for
 
 from config import Config
 from database import DatabaseNotConfigured, check_connection
@@ -52,6 +52,17 @@ def create_app():
         if request.path.startswith("/api/"):
             return jsonify({"error": "No autenticado. Inicia sesión de nuevo."}), 401
         return redirect(url_for("auth.login_page", next=request.path))
+
+    @app.before_request
+    def resolve_timezone():
+        # Se resuelve una sola vez por petición y queda disponible para
+        # utils.formatting.unix_to_readable (y por tanto para el filtro
+        # Jinja `fecha`) sin tener que tocar cada punto de la app que
+        # formatea una fecha.
+        if request.endpoint == "static":
+            return None
+        from services import timezone_settings
+        g.tz_name = timezone_settings.get_effective_timezone(current_user())
 
     @app.route("/api/health")
     def health():

@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, render_template
 
 from services import stats as stats_service
+from utils.formatting import current_utc_offset_sql
 from utils.security import login_required
 
 bp = Blueprint("stats", __name__)
@@ -51,16 +52,16 @@ def api_top_entidades():
 @bp.route("/api/estadisticas/actividad")
 @login_required
 def api_actividad():
-    return jsonify(stats_service.get_activity_timeseries())
+    return jsonify(stats_service.get_activity_timeseries(tz_offset=current_utc_offset_sql()))
 
 
 @bp.route("/api/estadisticas/actividad-horaria")
 @login_required
 def api_actividad_horaria():
-    return jsonify(stats_service.get_hourly_activity())
+    return jsonify(stats_service.get_hourly_activity(tz_offset=current_utc_offset_sql()))
 
 
 @bp.route("/api/estadisticas/heatmap")
 @login_required
 def api_heatmap():
-    return jsonify(stats_service.get_heatmap())
+    return jsonify(stats_service.get_heatmap(tz_offset=current_utc_offset_sql()))

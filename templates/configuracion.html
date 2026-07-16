@@ -29,7 +29,49 @@
             <button type="submit" class="btn btn-primary">Cambiar contraseña</button>
         </div>
     </form>
+
+    <div class="filters-grid filters-grid-compact" style="margin-top:16px;">
+        <div class="field">
+            <label for="tz-user">Mi zona horaria</label>
+            <select id="tz-user">
+                <option value="">Usar la de la aplicación ({{ app_timezone }})</option>
+                {% for value, label in timezone_choices %}
+                <option value="{{ value }}" {{ 'selected' if user_timezone == value else '' }}>{{ label }} ({{ value }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="field field-actions">
+            <button type="button" id="btn-save-user-tz" class="btn btn-outline">Guardar mi zona horaria</button>
+        </div>
+    </div>
+    <p class="muted-text">
+        Todas las fechas de la WebUI (registros, estadísticas, dashboard, modales, alertas...) se
+        muestran en esta zona horaria. La base de datos siempre guarda los tiempos en UTC — esto
+        solo cambia cómo se ven.
+    </p>
 </section>
+
+{% if current_user and current_user.role == 'admin' %}
+<section class="card">
+    <div class="card-header"><h3>Zona horaria de la aplicación</h3></div>
+    <p class="muted-text" style="margin-bottom: 12px;">
+        Se usa para cualquier usuario que no haya elegido su propia zona horaria personal.
+    </p>
+    <div class="filters-grid filters-grid-compact">
+        <div class="field">
+            <label for="tz-app">Zona horaria por defecto</label>
+            <select id="tz-app">
+                {% for value, label in timezone_choices %}
+                <option value="{{ value }}" {{ 'selected' if app_timezone == value else '' }}>{{ label }} ({{ value }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="field field-actions">
+            <button type="button" id="btn-save-app-tz" class="btn btn-primary">Guardar zona horaria de la aplicación</button>
+        </div>
+    </div>
+</section>
+{% endif %}
 
 <section class="card">
     <div class="card-header">

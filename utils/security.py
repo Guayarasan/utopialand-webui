@@ -40,6 +40,7 @@ def current_user():
         "id": session["user_id"],
         "username": session.get("username"),
         "role": session.get("role"),
+        "timezone": session.get("timezone"),
     }
 
 
@@ -48,7 +49,15 @@ def login_user(user_row):
     session["user_id"] = user_row["id"]
     session["username"] = user_row["username"]
     session["role"] = user_row["role"]
+    session["timezone"] = user_row.get("timezone")
     session.permanent = True
+
+
+def update_session_timezone(tz_name):
+    """Refleja de inmediato un cambio de zona horaria personal sin
+    necesidad de volver a iniciar sesión."""
+    if "user_id" in session:
+        session["timezone"] = tz_name
 
 
 def logout_user():

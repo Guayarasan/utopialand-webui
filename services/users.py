@@ -20,7 +20,7 @@ def list_users():
 
 def get_user_by_username(username):
     return fetch_one(
-        "SELECT id, username, password_hash, role, active FROM webui_users WHERE username = %s",
+        "SELECT id, username, password_hash, role, active, timezone FROM webui_users WHERE username = %s",
         [username],
     )
 
